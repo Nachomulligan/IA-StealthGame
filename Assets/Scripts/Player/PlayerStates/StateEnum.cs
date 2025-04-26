@@ -9,5 +9,6 @@ public enum StateEnum
     Walk,
     Spin,
     Chase,
-    GoZone
+    GoZone,
+    Patrol
 }

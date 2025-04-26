@@ -67,6 +67,11 @@ public class PatrolToWaypoints : ISteering
         }
     }
 
+    public int GetCurrentWaypointIndex()
+    {
+        return _currentIndex;
+    }
+
     public int GetPatrolDirection()
     {
         return _patrolDirection;

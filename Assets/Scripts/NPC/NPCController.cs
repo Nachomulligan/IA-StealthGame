@@ -12,6 +12,10 @@ public class NPCController : MonoBehaviour
     public List<Transform> patrolWaypoints;
     ITreeNode _root;
     ISteering _steering;
+    private ISteering _patrolSteering;
+    private ISteering _chaseSteering;
+    private ISteering _goZoneSteering;
+
     private void Awake()
     {
         _model = GetComponent<NPCModel>();
@@ -37,24 +41,33 @@ public class NPCController : MonoBehaviour
     }
     void InitializedSteering()
     {
-        var seek = new Seek(_model.transform, target.transform);
-        var flee = new Flee(_model.transform, target.transform);
-        var pursuit = new Pursuit(_model.transform, target, 0, timePrediction);
-        var evade = new Evade(_model.transform, target, 0, timePrediction);
+        //var seek = new Seek(_model.transform, target.transform);
+        //var flee = new Flee(_model.transform, target.transform);
+        //var pursuit = new Pursuit(_model.transform, target, 0, timePrediction);
+        //var evade = new Evade(_model.transform, target, 0, timePrediction);
 
-        // Creamos lista de Vector3 a partir de los transforms de los waypoints
+        //// Creamos lista de Vector3 a partir de los transforms de los waypoints
+        //List<Vector3> waypoints = new List<Vector3>();
+        //foreach (var wp in patrolWaypoints)
+        //{
+        //    if (wp != null)
+        //        waypoints.Add(wp.position);
+        //}
+
+        //// Creamos el patrol steering
+        //var patrol = new PatrolToWaypoints(waypoints, _model.transform, 0.5f);
+
+        //_patrolSteering = patrol;
+        //_steering = pursuit;
+        _chaseSteering = new Pursuit(_model.transform, target, 0, timePrediction);
+
         List<Vector3> waypoints = new List<Vector3>();
         foreach (var wp in patrolWaypoints)
         {
             if (wp != null)
                 waypoints.Add(wp.position);
         }
-
-        // Creamos el patrol steering
-        var patrol = new PatrolToWaypoints(waypoints, _model.transform, 0.5f);
-
-        // Asignamos el steering
-        _steering = patrol; // Cambiamos esto a patrol para probar el patrullaje
+        _patrolSteering = new PatrolToWaypoints(waypoints, _model.transform, 0.5f);
     }
     void InitializedFSM()
     {
@@ -63,11 +76,14 @@ public class NPCController : MonoBehaviour
 
         var idle = new NPCSIdle<StateEnum>();
         var attack = new NPCSAttack<StateEnum>();
-        var chase = new NPCSSteering<StateEnum>(_steering);
+        var chase = new NPCSSteering<StateEnum>(_chaseSteering);
         var goZone = new NPCSChase<StateEnum>(zone);
+        var patrol = new NPCSPatrol<StateEnum>(_patrolSteering);
+
 
         var stateList = new List<PSBase<StateEnum>>();
         stateList.Add(idle);
+        stateList.Add(patrol);
         stateList.Add(attack);
         stateList.Add(chase);
         stateList.Add(goZone);
@@ -75,6 +91,7 @@ public class NPCController : MonoBehaviour
         idle.AddTransition(StateEnum.Chase, chase);
         idle.AddTransition(StateEnum.Spin, attack);
         idle.AddTransition(StateEnum.GoZone, goZone);
+        idle.AddTransition(StateEnum.Patrol, patrol);
 
         attack.AddTransition(StateEnum.Idle, idle);
         attack.AddTransition(StateEnum.Chase, chase);
@@ -87,6 +104,9 @@ public class NPCController : MonoBehaviour
         goZone.AddTransition(StateEnum.Chase, chase);
         goZone.AddTransition(StateEnum.Spin, attack);
         goZone.AddTransition(StateEnum.Idle, idle);
+
+        patrol.AddTransition(StateEnum.Idle, idle);
+        patrol.AddTransition(StateEnum.Chase, chase);
 
         for (int i = 0; i < stateList.Count; i++)
         {
@@ -102,15 +122,17 @@ public class NPCController : MonoBehaviour
         var attack = new ActionNode(() => _fsm.Transition(StateEnum.Spin));
         var chase = new ActionNode(() => _fsm.Transition(StateEnum.Chase));
         var goZone = new ActionNode(() => _fsm.Transition(StateEnum.GoZone));
+        var patrol = new ActionNode(() => _fsm.Transition(StateEnum.Patrol));
 
         var qCanAttack = new QuestionNode(QuestionCanAttack, attack, chase);
         var qGoToZone = new QuestionNode(QuestionGoToZone, goZone, idle);
-        var qTargetInView = new QuestionNode(QuestionTargetInView, qCanAttack, qGoToZone);
+        var qTargetInView = new QuestionNode(QuestionTargetInView, qCanAttack, patrol);
 
-        _root = qCanAttack;
+        _root = qTargetInView;
     }
     bool QuestionCanAttack()
     {
+        if (target == null) return false;
         return Vector3.Distance(_model.Position, target.position) <= _model.attackRange;
     }
     bool QuestionGoToZone()
