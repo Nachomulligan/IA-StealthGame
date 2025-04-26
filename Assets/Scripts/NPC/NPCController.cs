@@ -12,6 +12,7 @@ public class NPCController : MonoBehaviour
     public List<Transform> patrolWaypoints;
     ITreeNode _root;
     ISteering _steering;
+    PatrolToWaypoints _waypoints;
     private void Awake()
     {
         _model = GetComponent<NPCModel>();
@@ -65,28 +66,35 @@ public class NPCController : MonoBehaviour
         var attack = new NPCSAttack<StateEnum>();
         var chase = new NPCSSteering<StateEnum>(_steering);
         var goZone = new NPCSChase<StateEnum>(zone);
+        var patrol = new NPCPatrolState<StateEnum>(_waypoints);
 
         var stateList = new List<PSBase<StateEnum>>();
         stateList.Add(idle);
         stateList.Add(attack);
         stateList.Add(chase);
         stateList.Add(goZone);
+        stateList.Add(patrol);
+
+        attack.AddTransition(StateEnum.Patrol, patrol);
 
         idle.AddTransition(StateEnum.Chase, chase);
         idle.AddTransition(StateEnum.Spin, attack);
         idle.AddTransition(StateEnum.GoZone, goZone);
 
         attack.AddTransition(StateEnum.Idle, idle);
+        attack.AddTransition(StateEnum.Patrol, patrol);
         attack.AddTransition(StateEnum.Chase, chase);
         attack.AddTransition(StateEnum.GoZone, goZone);
 
         chase.AddTransition(StateEnum.Idle, idle);
+        attack.AddTransition(StateEnum.Patrol, patrol);
         chase.AddTransition(StateEnum.Spin, attack);
         chase.AddTransition(StateEnum.GoZone, goZone);
 
         goZone.AddTransition(StateEnum.Chase, chase);
         goZone.AddTransition(StateEnum.Spin, attack);
         goZone.AddTransition(StateEnum.Idle, idle);
+        attack.AddTransition(StateEnum.Patrol, patrol);
 
         for (int i = 0; i < stateList.Count; i++)
         {
@@ -102,6 +110,7 @@ public class NPCController : MonoBehaviour
         var attack = new ActionNode(() => _fsm.Transition(StateEnum.Spin));
         var chase = new ActionNode(() => _fsm.Transition(StateEnum.Chase));
         var goZone = new ActionNode(() => _fsm.Transition(StateEnum.GoZone));
+        var patrol = new ActionNode(() => _fsm.Transition(StateEnum.Patrol));
 
         var qCanAttack = new QuestionNode(QuestionCanAttack, attack, chase);
         var qGoToZone = new QuestionNode(QuestionGoToZone, goZone, idle);
