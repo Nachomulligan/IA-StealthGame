@@ -10,6 +10,11 @@ public class FSM<T>
     {
         SetInit(curr);
     }
+    public IState<T> CurrState()
+    {
+        return _currState;
+    }
+
     public void SetInit(IState<T> curr)
     {
         curr.StateMachine = this;
@@ -34,10 +39,5 @@ public class FSM<T>
         _currState.Exit();
         _currState = newState;
         _currState.Enter();
-    }
-
-    public IState<T> GetCurrentState()
-    {
-        return _currState;
     }
 }
