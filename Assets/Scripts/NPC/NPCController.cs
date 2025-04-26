@@ -9,6 +9,7 @@ public class NPCController : MonoBehaviour
     FSM<StateEnum> _fsm;
     NPCModel _model;
     LineOfSightMono _los;
+    public List<Transform> patrolWaypoints;
     ITreeNode _root;
     ISteering _steering;
     private void Awake()
@@ -40,7 +41,20 @@ public class NPCController : MonoBehaviour
         var flee = new Flee(_model.transform, target.transform);
         var pursuit = new Pursuit(_model.transform, target, 0, timePrediction);
         var evade = new Evade(_model.transform, target, 0, timePrediction);
-        _steering = pursuit;
+
+        // Creamos lista de Vector3 a partir de los transforms de los waypoints
+        List<Vector3> waypoints = new List<Vector3>();
+        foreach (var wp in patrolWaypoints)
+        {
+            if (wp != null)
+                waypoints.Add(wp.position);
+        }
+
+        // Creamos el patrol steering
+        var patrol = new PatrolToWaypoints(waypoints, _model.transform, 0.5f);
+
+        // Asignamos el steering
+        _steering = patrol; // Cambiamos esto a patrol para probar el patrullaje
     }
     void InitializedFSM()
     {
