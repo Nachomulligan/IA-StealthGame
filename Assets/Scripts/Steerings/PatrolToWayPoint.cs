@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 public class PatrolToWaypoints : ISteering
@@ -10,6 +10,10 @@ public class PatrolToWaypoints : ISteering
     private int _patrolDirection = 1; // 1 = forward, -1 = backward
 
     private float _threshold = 0.2f;
+
+    private bool _completedCycle = false;
+
+    public bool CompletedCycle => _completedCycle;
 
     public PatrolToWaypoints(List<Vector3> waypoints, Transform self, float threshold = 0.2f)
     {
@@ -59,11 +63,13 @@ public class PatrolToWaypoints : ISteering
         {
             _currentIndex = _waypoints.Count - 2;
             _patrolDirection = -1;
+            _completedCycle = true; // 🚩 Patrulla ida completada
         }
         else if (_currentIndex < 0)
         {
             _currentIndex = 1;
             _patrolDirection = 1;
+            _completedCycle = true; // 🚩 Patrulla vuelta completada
         }
     }
 

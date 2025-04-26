@@ -1,3 +1,4 @@
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -14,19 +15,27 @@ public class NPCController : MonoBehaviour
     ISteering _steering;
     private ISteering _patrolSteering;
     private ISteering _chaseSteering;
-    private ISteering _goZoneSteering;
+    public bool _restTimeOut;
+    public bool _patrolTimeOut;
+    public int restTime = 5;
+    public int waitTime = 20;
+
+    private bool _idleCoroutineStarted = false;
+    private bool _patrolCoroutineStarted = false;
 
     private void Awake()
     {
         _model = GetComponent<NPCModel>();
         _los = GetComponent<LineOfSightMono>();
     }
+
     void Start()
     {
         InitializedSteering();
         InitializedFSM();
         InitializedTree();
     }
+
     void Update()
     {
         if (target != null)
@@ -35,30 +44,14 @@ public class NPCController : MonoBehaviour
             _root.Execute();
         }
     }
+
     private void FixedUpdate()
     {
         _fsm.OnFixExecute();
     }
+
     void InitializedSteering()
     {
-        //var seek = new Seek(_model.transform, target.transform);
-        //var flee = new Flee(_model.transform, target.transform);
-        //var pursuit = new Pursuit(_model.transform, target, 0, timePrediction);
-        //var evade = new Evade(_model.transform, target, 0, timePrediction);
-
-        //// Creamos lista de Vector3 a partir de los transforms de los waypoints
-        //List<Vector3> waypoints = new List<Vector3>();
-        //foreach (var wp in patrolWaypoints)
-        //{
-        //    if (wp != null)
-        //        waypoints.Add(wp.position);
-        //}
-
-        //// Creamos el patrol steering
-        //var patrol = new PatrolToWaypoints(waypoints, _model.transform, 0.5f);
-
-        //_patrolSteering = patrol;
-        //_steering = pursuit;
         _chaseSteering = new Pursuit(_model.transform, target, 0, timePrediction);
 
         List<Vector3> waypoints = new List<Vector3>();
@@ -69,6 +62,7 @@ public class NPCController : MonoBehaviour
         }
         _patrolSteering = new PatrolToWaypoints(waypoints, _model.transform, 0.5f);
     }
+
     void InitializedFSM()
     {
         _fsm = new FSM<StateEnum>();
@@ -80,13 +74,7 @@ public class NPCController : MonoBehaviour
         var goZone = new NPCSChase<StateEnum>(zone);
         var patrol = new NPCSPatrol<StateEnum>(_patrolSteering);
 
-
-        var stateList = new List<PSBase<StateEnum>>();
-        stateList.Add(idle);
-        stateList.Add(patrol);
-        stateList.Add(attack);
-        stateList.Add(chase);
-        stateList.Add(goZone);
+        var stateList = new List<PSBase<StateEnum>> { idle, patrol, attack, chase, goZone };
 
         idle.AddTransition(StateEnum.Chase, chase);
         idle.AddTransition(StateEnum.Spin, attack);
@@ -108,9 +96,9 @@ public class NPCController : MonoBehaviour
         patrol.AddTransition(StateEnum.Idle, idle);
         patrol.AddTransition(StateEnum.Chase, chase);
 
-        for (int i = 0; i < stateList.Count; i++)
+        foreach (var state in stateList)
         {
-            stateList[i].Initialize(_model, look, _model);
+            state.Initialize(_model, look, _model);
         }
 
         _fsm.SetInit(idle);
@@ -118,30 +106,82 @@ public class NPCController : MonoBehaviour
 
     void InitializedTree()
     {
-        var idle = new ActionNode(() => _fsm.Transition(StateEnum.Idle));
+        var idle = new ActionNode(() =>
+        {
+            _fsm.Transition(StateEnum.Idle);
+            if (!_idleCoroutineStarted)
+            {
+                StartCoroutine(idleTime());
+                _idleCoroutineStarted = true;
+                _patrolCoroutineStarted = false;
+            }
+        });
+
+        var patrol = new ActionNode(() =>
+        {
+            _fsm.Transition(StateEnum.Patrol);
+            if (!_patrolCoroutineStarted)
+            {
+                StartCoroutine(patrolTimer());
+                _patrolCoroutineStarted = true;
+                _idleCoroutineStarted = false;
+            }
+        });
+
         var attack = new ActionNode(() => _fsm.Transition(StateEnum.Spin));
         var chase = new ActionNode(() => _fsm.Transition(StateEnum.Chase));
         var goZone = new ActionNode(() => _fsm.Transition(StateEnum.GoZone));
-        var patrol = new ActionNode(() => _fsm.Transition(StateEnum.Patrol));
+
+        // Armar árbol
+        var qIsTired = new QuestionNode(QuestionIsTired, idle, patrol); // Si está cansado -> idle, sino -> patrol
+        var qIsRested = new QuestionNode(QuestionIsRested, patrol, idle); // ya no lo necesitamos como root
 
         var qCanAttack = new QuestionNode(QuestionCanAttack, attack, chase);
         var qGoToZone = new QuestionNode(QuestionGoToZone, goZone, idle);
-        var qTargetInView = new QuestionNode(QuestionTargetInView, qCanAttack, patrol);
 
-        _root = qTargetInView;
+        var qTargetInView = new QuestionNode(QuestionTargetInView, qCanAttack, qIsTired);
+
+        _root = qIsTired; // <<< CORREGIDO, ahora empieza preguntando si está cansado
     }
+
     bool QuestionCanAttack()
     {
         if (target == null) return false;
         return Vector3.Distance(_model.Position, target.position) <= _model.attackRange;
     }
+
     bool QuestionGoToZone()
     {
         return Vector3.Distance(_model.transform.position, zone.transform.position) > 0.25f;
     }
+
     bool QuestionTargetInView()
     {
         if (target == null) return false;
         return _los.LOS(target.transform);
+    }
+
+    bool QuestionIsRested()
+    {
+        return _restTimeOut;
+    }
+
+    bool QuestionIsTired()
+    {
+        return _patrolTimeOut;
+    }
+
+    public IEnumerator idleTime()
+    {
+        _restTimeOut = false;
+        yield return new WaitForSeconds(waitTime);
+        _restTimeOut = true;
+    }
+
+    public IEnumerator patrolTimer()
+    {
+        _patrolTimeOut = false;
+        yield return new WaitForSeconds(restTime);
+        _patrolTimeOut = true;
     }
 }
