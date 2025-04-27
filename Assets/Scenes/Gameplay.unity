@@ -526,9 +526,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9218a5631bd5b0645b2f488b13e4acac, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerHasWeapon: 0
-  chaseWeightWithWeapon: 60
-  evadeWeightWithWeapon: 40
+  playerHasWeapon: 1
+  chaseWeightWithWeapon: 80.9
+  evadeWeightWithWeapon: 20.7
   hasSeenPlayerFirstTime: 0
   shouldEvade: 0
 --- !u!1 &963194225

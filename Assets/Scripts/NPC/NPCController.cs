@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-
 public class NPCController : MonoBehaviour
 {
     public Rigidbody target;
@@ -56,6 +55,7 @@ public class NPCController : MonoBehaviour
     void InitializedSteering()
     {
         _chaseSteering = new Pursuit(_model.transform, target, 0, timePrediction);
+        _evadeSteering = new Evade(_model.transform, target, 0, timePrediction);
 
         List<Vector3> waypoints = new List<Vector3>();
         foreach (var wp in patrolWaypoints)
@@ -102,8 +102,9 @@ public class NPCController : MonoBehaviour
 
         patrol.AddTransition(StateEnum.Idle, idle);
         patrol.AddTransition(StateEnum.Chase, chase);
+        patrol.AddTransition(StateEnum.Evade, evade);
 
-        evade.AddTransition(StateEnum.Chase, evade);
+        evade.AddTransition(StateEnum.Chase, chase);
 
         for (int i = 0; i < stateList.Count; i++)
         {
@@ -132,10 +133,9 @@ public class NPCController : MonoBehaviour
         var goZone = new ActionNode(() => _fsm.Transition(StateEnum.GoZone));
         var evade = new ActionNode(() => _fsm.Transition(StateEnum.Evade)); 
 
-        // Questions
-        var qPlayerArmed = new QuestionNode(() => QuestionIsPlayerArmed(), evade, chase); // primero pregunta si huir
-        var qTargetOutOfSight = new QuestionNode(() => !QuestionTargetInView(), patrol, qPlayerArmed);
+        var qTargetOutOfSight = new QuestionNode(() => !QuestionTargetInView(), patrol, chase);
         var qCanAttack = new QuestionNode(() => QuestionCanAttack(), attack, qTargetOutOfSight);
+        var qShouldEvade = new QuestionNode(QuestionShouldEvade, evade, qCanAttack);
         var qGoToZone = new QuestionNode(() => QuestionGoToZone(), goZone, idle);
 
         var qIsTired = new QuestionNode(() => QuestionIsTired(), idle, patrol);
@@ -143,11 +143,15 @@ public class NPCController : MonoBehaviour
 
         var qCurrentlyPatrolling = new QuestionNode(() => _fsm.CurrState() is NPCSPatrol<StateEnum>, qIsTired, qIsRested);
 
-        var qTargetInView = new QuestionNode(() => QuestionTargetInView(), qCanAttack, qCurrentlyPatrolling);
+        var qTargetInView = new QuestionNode(() => QuestionTargetInView(), qShouldEvade, qCurrentlyPatrolling);
 
         _root = qTargetInView;
     }
 
+    bool QuestionShouldEvade()
+    {
+        return _reactionSystem.DecideIfShouldEvade();
+    }
     bool QuestionIsPlayerArmed()
     {
         return playerArmed;
