@@ -130,10 +130,10 @@ public class NPCController : MonoBehaviour
         var attack = new ActionNode(() => _fsm.Transition(StateEnum.Spin));
         var chase = new ActionNode(() => _fsm.Transition(StateEnum.Chase));
         var goZone = new ActionNode(() => _fsm.Transition(StateEnum.GoZone));
-        var evade = new ActionNode(() => _fsm.Transition(StateEnum.Evade)); 
+        var evade = new ActionNode(() => _fsm.Transition(StateEnum.Evade));
 
-        var qTargetOutOfSight = new QuestionNode(() => !QuestionTargetInView(), patrol, chase);
-        var qCanAttack = new QuestionNode(() => QuestionCanAttack(), attack, qTargetOutOfSight);
+        var qTargetOutOfPursuitRange = new QuestionNode(() => !QuestionTargetInPursuitRange(), patrol, chase);
+        var qCanAttack = new QuestionNode(() => QuestionCanAttack(), attack, qTargetOutOfPursuitRange);
         var qShouldEvade = new QuestionNode(QuestionShouldEvade, evade, qCanAttack);
         var qGoToZone = new QuestionNode(() => QuestionGoToZone(), goZone, idle);
 
@@ -147,6 +147,11 @@ public class NPCController : MonoBehaviour
         _root = qTargetInView;
     }
 
+    bool QuestionTargetInPursuitRange()
+    {
+        if (target == null) return false;
+        return Vector3.Distance(_model.Position, target.position) <= _model.pursuitRange;
+    }
     bool QuestionShouldEvade()
     {
         return _reactionSystem.DecideIfShouldEvade();

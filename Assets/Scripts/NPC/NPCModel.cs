@@ -3,6 +3,7 @@ using UnityEngine;
 public class NPCModel : PlayerModel
 {
     public float attackRange;
+   [SerializeField] public float pursuitRange;
     public LayerMask enemyMask;
     ObstacleAvoidance _obs;
     ILook _look;
@@ -27,5 +28,13 @@ public class NPCModel : PlayerModel
         dir = _obs.GetDir(dir);
         _look.LookDir(dir);
         base.Move(dir);
+    }
+    private void OnDrawGizmosSelected()
+    {
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireSphere(transform.position, attackRange);
+
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawWireSphere(transform.position, pursuitRange);
     }
 }
