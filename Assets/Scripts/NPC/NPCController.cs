@@ -21,7 +21,6 @@ public class NPCController : MonoBehaviour
     public bool _patrolTimeOut;
     public int restTime = 5;
     public int waitTime = 5;
-    public bool playerArmed;
     private NPCReactionSystem _reactionSystem;
 
     private void Awake()
@@ -152,10 +151,6 @@ public class NPCController : MonoBehaviour
     {
         return _reactionSystem.DecideIfShouldEvade();
     }
-    bool QuestionIsPlayerArmed()
-    {
-        return playerArmed;
-    }
 
     bool QuestionCanAttack()
     {
@@ -196,20 +191,5 @@ public class NPCController : MonoBehaviour
         _patrolTimeOut = false;
         yield return new WaitForSeconds(restTime);
         _patrolTimeOut = true;
-    }
-
-    private void OnEnable()
-    {
-        PlayerController.OnPlayerArmedChanged += UpdatePlayerArmedStatus;
-    }
-
-    private void OnDisable()
-    {
-        PlayerController.OnPlayerArmedChanged -= UpdatePlayerArmedStatus;
-    }
-
-    void UpdatePlayerArmedStatus(bool isArmed)
-    {
-        playerArmed = isArmed;
     }
 }

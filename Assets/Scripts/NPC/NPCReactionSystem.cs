@@ -20,6 +20,22 @@ public class NPCReactionSystem : MonoBehaviour
     [Tooltip("Decisión tomada: ¿Debería evadir?")]
     public bool shouldEvade = false;
 
+
+    private void OnEnable()
+    {
+        PlayerController.OnPlayerArmedChanged += UpdateWeaponStatus;
+    }
+
+    private void OnDisable()
+    {
+        PlayerController.OnPlayerArmedChanged -= UpdateWeaponStatus;
+    }
+
+    private void UpdateWeaponStatus(bool isArmed)
+    {
+        playerHasWeapon = isArmed;
+    }
+
     /// <summary>
     /// Determina si el NPC debería evadir al jugador basado en si tiene un arma
     /// </summary>
