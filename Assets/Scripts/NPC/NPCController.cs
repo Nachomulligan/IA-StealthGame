@@ -17,17 +17,19 @@ public class NPCController : MonoBehaviour
     private ISteering _patrolSteering;
     private ISteering _chaseSteering;
     private ISteering _goZoneSteering;
-    private ISteering _fleeSteering;
+    private ISteering _evadeSteering;
     public bool _restTimeOut;
     public bool _patrolTimeOut;
     public int restTime = 5;
     public int waitTime = 5;
     public bool playerArmed;
+    private NPCReactionSystem _reactionSystem;
 
     private void Awake()
     {
         _model = GetComponent<NPCModel>();
         _los = GetComponent<LineOfSightMono>();
+        _reactionSystem = GetComponent<NPCReactionSystem>();
     }
 
     void Start()
@@ -74,16 +76,16 @@ public class NPCController : MonoBehaviour
         var chase = new NPCSSteering<StateEnum>(_chaseSteering);
         var goZone = new NPCSChase<StateEnum>(zone);
         var patrol = new NPCSPatrol<StateEnum>(_patrolSteering);
-        var flee = new NPCFlee<StateEnum>(_fleeSteering); // 👉 CAMBIO ACA, usamos Transform directo
+        var evade = new NPCSEvade<StateEnum>(_evadeSteering); 
 
-        var stateList = new List<PSBase<StateEnum>> { idle, patrol, attack, chase, goZone, flee };
+        var stateList = new List<PSBase<StateEnum>> { idle, patrol, attack, chase, goZone, evade };
 
         // Transiciones
         idle.AddTransition(StateEnum.Chase, chase);
         idle.AddTransition(StateEnum.Spin, attack);
         idle.AddTransition(StateEnum.GoZone, goZone);
         idle.AddTransition(StateEnum.Patrol, patrol);
-        idle.AddTransition(StateEnum.Flee, flee);
+        idle.AddTransition(StateEnum.Evade, evade);
 
         attack.AddTransition(StateEnum.Idle, idle);
         attack.AddTransition(StateEnum.Chase, chase);
@@ -101,7 +103,7 @@ public class NPCController : MonoBehaviour
         patrol.AddTransition(StateEnum.Idle, idle);
         patrol.AddTransition(StateEnum.Chase, chase);
 
-        flee.AddTransition(StateEnum.Chase, flee);
+        evade.AddTransition(StateEnum.Chase, evade);
 
         for (int i = 0; i < stateList.Count; i++)
         {
@@ -128,10 +130,10 @@ public class NPCController : MonoBehaviour
         var attack = new ActionNode(() => _fsm.Transition(StateEnum.Spin));
         var chase = new ActionNode(() => _fsm.Transition(StateEnum.Chase));
         var goZone = new ActionNode(() => _fsm.Transition(StateEnum.GoZone));
-        var flee = new ActionNode(() => _fsm.Transition(StateEnum.Flee)); // 👉 NUEVO nodo de acción de huida
+        var evade = new ActionNode(() => _fsm.Transition(StateEnum.Evade)); 
 
         // Questions
-        var qPlayerArmed = new QuestionNode(() => QuestionIsPlayerArmed(), flee, chase); // 👉 primero pregunta si huir
+        var qPlayerArmed = new QuestionNode(() => QuestionIsPlayerArmed(), evade, chase); // primero pregunta si huir
         var qTargetOutOfSight = new QuestionNode(() => !QuestionTargetInView(), patrol, qPlayerArmed);
         var qCanAttack = new QuestionNode(() => QuestionCanAttack(), attack, qTargetOutOfSight);
         var qGoToZone = new QuestionNode(() => QuestionGoToZone(), goZone, idle);

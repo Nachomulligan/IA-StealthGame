@@ -1,10 +1,10 @@
 using UnityEngine;
 
-public class NPCFlee<T> : NPCSBase<T>
+public class NPCSEvade<T> : NPCSBase<T>
 {
     ISteering _steering;
 
-    public NPCFlee(ISteering steering)
+    public NPCSEvade(ISteering steering)
     {
         _steering = steering;
     }
@@ -20,7 +20,7 @@ public class NPCFlee<T> : NPCSBase<T>
         }
 
         Vector3 direction = _steering.GetDir();
-        Debug.Log($"[FLEE STATE] Direction: {direction}");
+        Debug.Log($"[evade STATE] Direction: {direction}");
 
         if (_move == null)
         {

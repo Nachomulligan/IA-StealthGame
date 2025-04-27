@@ -11,5 +11,5 @@ public enum StateEnum
     Chase,
     GoZone,
     Patrol,
-    Flee
+    Evade
 }
