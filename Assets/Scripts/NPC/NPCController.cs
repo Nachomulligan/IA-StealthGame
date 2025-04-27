@@ -67,7 +67,6 @@ public class NPCController : MonoBehaviour
         var goZone = new NPCSChase<StateEnum>(zone);
         var patrol = new NPCSPatrol<StateEnum>(_patrolSteering);
 
-
         var stateList = new List<PSBase<StateEnum>>();
         stateList.Add(idle);
         stateList.Add(patrol);
@@ -75,6 +74,7 @@ public class NPCController : MonoBehaviour
         stateList.Add(chase);
         stateList.Add(goZone);
 
+        // TRANSICIONES
         idle.AddTransition(StateEnum.Chase, chase);
         idle.AddTransition(StateEnum.Spin, attack);
         idle.AddTransition(StateEnum.GoZone, goZone);
@@ -87,6 +87,7 @@ public class NPCController : MonoBehaviour
         chase.AddTransition(StateEnum.Idle, idle);
         chase.AddTransition(StateEnum.Spin, attack);
         chase.AddTransition(StateEnum.GoZone, goZone);
+        chase.AddTransition(StateEnum.Patrol, patrol); // 👈 NUEVA transición: chase puede volver a patrullar
 
         goZone.AddTransition(StateEnum.Chase, chase);
         goZone.AddTransition(StateEnum.Spin, attack);
@@ -105,7 +106,6 @@ public class NPCController : MonoBehaviour
 
     void InitializedTree()
     {
-
         var idle = new ActionNode(() =>
         {
             _fsm.Transition(StateEnum.Idle);
@@ -122,18 +122,20 @@ public class NPCController : MonoBehaviour
         var chase = new ActionNode(() => _fsm.Transition(StateEnum.Chase));
         var goZone = new ActionNode(() => _fsm.Transition(StateEnum.GoZone));
 
-
+        // NUEVAS QUESTIONS
+        var qTargetOutOfSight = new QuestionNode(() => !QuestionTargetInView(), patrol, chase);
+        var qCanAttack = new QuestionNode(QuestionCanAttack, attack, qTargetOutOfSight);
+        var qGoToZone = new QuestionNode(QuestionGoToZone, goZone, idle);
 
         var qIsTired = new QuestionNode(QuestionIsTired, idle, patrol);
         var qIsRested = new QuestionNode(QuestionIsRested, patrol, idle);
 
-        var qCanAttack = new QuestionNode(QuestionCanAttack, attack, chase);
-        var qGoToZone = new QuestionNode(QuestionGoToZone, goZone, idle);
-
         var qCurrentlyPatrolling = new QuestionNode(() => _fsm.CurrState() is NPCSPatrol<StateEnum>, qIsTired, qIsRested);
         var qTargetInView = new QuestionNode(QuestionTargetInView, qCanAttack, qCurrentlyPatrolling);
+
         _root = qTargetInView;
     }
+
     bool QuestionCanAttack()
     {
         if (target == null) return false;
@@ -152,7 +154,6 @@ public class NPCController : MonoBehaviour
     {
         return _restTimeOut;
     }
-
     bool QuestionIsTired()
     {
         return _patrolTimeOut;
@@ -174,5 +175,4 @@ public class NPCController : MonoBehaviour
         _patrolTimeOut = true;
         Debug.Log("Termina PatrolTimer: debe descansar (Idle).");
     }
-
 }

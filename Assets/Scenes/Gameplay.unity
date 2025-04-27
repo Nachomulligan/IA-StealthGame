@@ -2062,7 +2062,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxObs: 2
-  radius: 4
+  radius: 3.17
   angle: 227.6
   personalArea: 0.72
   obsMask:
