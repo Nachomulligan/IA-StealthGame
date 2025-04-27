@@ -8,10 +8,8 @@ public class PlayerController : MonoBehaviour
     [Header("Player Controller")]
     FSM<StateEnum> _fsm;
 
-    // NUEVO: evento para avisar a los NPCs
     public static event Action<bool> OnPlayerArmedChanged;
     public bool isArmed = false; // NUEVO
-
     private void Awake()
     {
         InitializeFSM();

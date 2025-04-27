@@ -21,13 +21,16 @@ public class NPCModel : PlayerModel
         {
             GameObject.Destroy(colls[i].gameObject);
         }
-        base.Attack();
     }
     public override void Move(Vector3 dir)
     {
         dir = _obs.GetDir(dir);
         _look.LookDir(dir);
         base.Move(dir);
+    }
+    public void Die()
+    {
+        Destroy(gameObject);
     }
     private void OnDrawGizmosSelected()
     {

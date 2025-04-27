@@ -11,7 +11,6 @@ GameObject:
   - component: {fileID: 5902471760367265790}
   - component: {fileID: 7617461254692431279}
   - component: {fileID: 8042961578883208235}
-  - component: {fileID: 1719731272471657010}
   m_Layer: 0
   m_Name: Weapon
   m_TagString: Untagged
@@ -87,15 +86,3 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!114 &1719731272471657010
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 738521412382929278}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 81a3eb6198c7bd640ac9f5b2d86ed208, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
