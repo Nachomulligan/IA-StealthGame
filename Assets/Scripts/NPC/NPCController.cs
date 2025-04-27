@@ -160,19 +160,19 @@ public class NPCController : MonoBehaviour
     }
     public IEnumerator idleTime()
     {
-        Debug.Log("Empieza IdleTime: esperando " + waitTime + " segundos.");
+        //Debug.Log("Empieza IdleTime: esperando " + waitTime + " segundos.");
         _restTimeOut = false;
         yield return new WaitForSeconds(waitTime);
         _restTimeOut = true;
-        Debug.Log("Termina IdleTime: puede patrullar.");
+        //Debug.Log("Termina IdleTime: puede patrullar.");
     }
 
     public IEnumerator patrolTimer()
     {
-        Debug.Log("Empieza PatrolTimer: patrullando " + restTime + " segundos.");
+        //Debug.Log("Empieza PatrolTimer: patrullando " + restTime + " segundos.");
         _patrolTimeOut = false;
         yield return new WaitForSeconds(restTime);
         _patrolTimeOut = true;
-        Debug.Log("Termina PatrolTimer: debe descansar (Idle).");
+        //Debug.Log("Termina PatrolTimer: debe descansar (Idle).");
     }
 }

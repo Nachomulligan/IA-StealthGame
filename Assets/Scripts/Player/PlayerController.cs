@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
+    [Header("Player Controller")]
     FSM<StateEnum> _fsm;
 
     private void Awake()
@@ -50,5 +51,52 @@ public class PlayerController : MonoBehaviour
             _fsm.Transition(StateEnum.Spin);
         }
         _fsm.OnExecute();
+
+        if (Input.GetKeyDown(KeyCode.E))
+        {
+            TryInteract();
+        }
     }
+
+
+    [Header("Interaction Settings")]
+    [SerializeField] private Transform interactionPoint;
+    [SerializeField] private float interactionRadius = 1f;
+    [SerializeField] private LayerMask interactionLayer;
+    private Collider[] interactables = new Collider[4];
+
+    [SerializeField] private Transform weaPoint;
+    [SerializeField] private GameObject currentWeapon;
+
+    public void EquipWeapon(GameObject weapon)
+    {
+        if (currentWeapon != null)
+        {
+            Destroy(currentWeapon);
+        }
+        currentWeapon = Instantiate(weapon, weaPoint.position, weaPoint.rotation, weaPoint);
+    }
+
+    private void TryInteract()
+    {
+        Debug.Log("Tried interaction");
+        int elements = Physics.OverlapSphereNonAlloc(interactionPoint.position, interactionRadius, interactables, interactionLayer);
+
+        if (elements == 0)
+        {
+            Debug.Log("No interactables found");
+            return;
+        }
+
+        for (int i = 0; i < elements; i++)
+        {
+            var interactable = interactables[i];
+            var interactableComponent = interactable.GetComponent<Iinteractable>();
+            if (interactableComponent != null)
+            {
+                interactableComponent.interaction();
+            }
+        }
+    }
+
 }

@@ -10,7 +10,6 @@ public class PlayerModel : MonoBehaviour, IMove, IAttack
     Action _onAttack = delegate { };
 
     public Action OnAttack { get => _onAttack; set => _onAttack = value; }
-
     public Vector3 Position => transform.position;
 
     protected virtual void Awake()
