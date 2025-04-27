@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+
 public class NPCController : MonoBehaviour
 {
     public Rigidbody target;
@@ -16,22 +17,26 @@ public class NPCController : MonoBehaviour
     private ISteering _patrolSteering;
     private ISteering _chaseSteering;
     private ISteering _goZoneSteering;
+    private ISteering _fleeSteering;
     public bool _restTimeOut;
     public bool _patrolTimeOut;
     public int restTime = 5;
     public int waitTime = 5;
+    public bool playerArmed;
 
     private void Awake()
     {
         _model = GetComponent<NPCModel>();
         _los = GetComponent<LineOfSightMono>();
     }
+
     void Start()
     {
         InitializedSteering();
         InitializedFSM();
         InitializedTree();
     }
+
     void Update()
     {
         if (target != null)
@@ -40,10 +45,12 @@ public class NPCController : MonoBehaviour
             _root.Execute();
         }
     }
+
     private void FixedUpdate()
     {
         _fsm.OnFixExecute();
     }
+
     void InitializedSteering()
     {
         _chaseSteering = new Pursuit(_model.transform, target, 0, timePrediction);
@@ -56,6 +63,7 @@ public class NPCController : MonoBehaviour
         }
         _patrolSteering = new PatrolToWaypoints(waypoints, _model.transform, 0.5f);
     }
+
     void InitializedFSM()
     {
         _fsm = new FSM<StateEnum>();
@@ -66,19 +74,16 @@ public class NPCController : MonoBehaviour
         var chase = new NPCSSteering<StateEnum>(_chaseSteering);
         var goZone = new NPCSChase<StateEnum>(zone);
         var patrol = new NPCSPatrol<StateEnum>(_patrolSteering);
+        var flee = new NPCFlee<StateEnum>(_fleeSteering); // 👉 CAMBIO ACA, usamos Transform directo
 
-        var stateList = new List<PSBase<StateEnum>>();
-        stateList.Add(idle);
-        stateList.Add(patrol);
-        stateList.Add(attack);
-        stateList.Add(chase);
-        stateList.Add(goZone);
+        var stateList = new List<PSBase<StateEnum>> { idle, patrol, attack, chase, goZone, flee };
 
-        // TRANSICIONES
+        // Transiciones
         idle.AddTransition(StateEnum.Chase, chase);
         idle.AddTransition(StateEnum.Spin, attack);
         idle.AddTransition(StateEnum.GoZone, goZone);
         idle.AddTransition(StateEnum.Patrol, patrol);
+        idle.AddTransition(StateEnum.Flee, flee);
 
         attack.AddTransition(StateEnum.Idle, idle);
         attack.AddTransition(StateEnum.Chase, chase);
@@ -87,7 +92,7 @@ public class NPCController : MonoBehaviour
         chase.AddTransition(StateEnum.Idle, idle);
         chase.AddTransition(StateEnum.Spin, attack);
         chase.AddTransition(StateEnum.GoZone, goZone);
-        chase.AddTransition(StateEnum.Patrol, patrol); // 👈 NUEVA transición: chase puede volver a patrullar
+        chase.AddTransition(StateEnum.Patrol, patrol);
 
         goZone.AddTransition(StateEnum.Chase, chase);
         goZone.AddTransition(StateEnum.Spin, attack);
@@ -95,6 +100,8 @@ public class NPCController : MonoBehaviour
 
         patrol.AddTransition(StateEnum.Idle, idle);
         patrol.AddTransition(StateEnum.Chase, chase);
+
+        flee.AddTransition(StateEnum.Chase, flee);
 
         for (int i = 0; i < stateList.Count; i++)
         {
@@ -121,19 +128,27 @@ public class NPCController : MonoBehaviour
         var attack = new ActionNode(() => _fsm.Transition(StateEnum.Spin));
         var chase = new ActionNode(() => _fsm.Transition(StateEnum.Chase));
         var goZone = new ActionNode(() => _fsm.Transition(StateEnum.GoZone));
+        var flee = new ActionNode(() => _fsm.Transition(StateEnum.Flee)); // 👉 NUEVO nodo de acción de huida
 
-        // NUEVAS QUESTIONS
-        var qTargetOutOfSight = new QuestionNode(() => !QuestionTargetInView(), patrol, chase);
-        var qCanAttack = new QuestionNode(QuestionCanAttack, attack, qTargetOutOfSight);
-        var qGoToZone = new QuestionNode(QuestionGoToZone, goZone, idle);
+        // Questions
+        var qPlayerArmed = new QuestionNode(() => QuestionIsPlayerArmed(), flee, chase); // 👉 primero pregunta si huir
+        var qTargetOutOfSight = new QuestionNode(() => !QuestionTargetInView(), patrol, qPlayerArmed);
+        var qCanAttack = new QuestionNode(() => QuestionCanAttack(), attack, qTargetOutOfSight);
+        var qGoToZone = new QuestionNode(() => QuestionGoToZone(), goZone, idle);
 
-        var qIsTired = new QuestionNode(QuestionIsTired, idle, patrol);
-        var qIsRested = new QuestionNode(QuestionIsRested, patrol, idle);
+        var qIsTired = new QuestionNode(() => QuestionIsTired(), idle, patrol);
+        var qIsRested = new QuestionNode(() => QuestionIsRested(), patrol, idle);
 
         var qCurrentlyPatrolling = new QuestionNode(() => _fsm.CurrState() is NPCSPatrol<StateEnum>, qIsTired, qIsRested);
-        var qTargetInView = new QuestionNode(QuestionTargetInView, qCanAttack, qCurrentlyPatrolling);
+
+        var qTargetInView = new QuestionNode(() => QuestionTargetInView(), qCanAttack, qCurrentlyPatrolling);
 
         _root = qTargetInView;
+    }
+
+    bool QuestionIsPlayerArmed()
+    {
+        return playerArmed;
     }
 
     bool QuestionCanAttack()
@@ -141,38 +156,54 @@ public class NPCController : MonoBehaviour
         if (target == null) return false;
         return Vector3.Distance(_model.Position, target.position) <= _model.attackRange;
     }
+
     bool QuestionGoToZone()
     {
         return Vector3.Distance(_model.transform.position, zone.transform.position) > 0.25f;
     }
+
     bool QuestionTargetInView()
     {
         if (target == null) return false;
         return _los.LOS(target.transform);
     }
+
     bool QuestionIsRested()
     {
         return _restTimeOut;
     }
+
     bool QuestionIsTired()
     {
         return _patrolTimeOut;
     }
+
     public IEnumerator idleTime()
     {
-        //Debug.Log("Empieza IdleTime: esperando " + waitTime + " segundos.");
         _restTimeOut = false;
         yield return new WaitForSeconds(waitTime);
         _restTimeOut = true;
-        //Debug.Log("Termina IdleTime: puede patrullar.");
     }
 
     public IEnumerator patrolTimer()
     {
-        //Debug.Log("Empieza PatrolTimer: patrullando " + restTime + " segundos.");
         _patrolTimeOut = false;
         yield return new WaitForSeconds(restTime);
         _patrolTimeOut = true;
-        //Debug.Log("Termina PatrolTimer: debe descansar (Idle).");
+    }
+
+    private void OnEnable()
+    {
+        PlayerController.OnPlayerArmedChanged += UpdatePlayerArmedStatus;
+    }
+
+    private void OnDisable()
+    {
+        PlayerController.OnPlayerArmedChanged -= UpdatePlayerArmedStatus;
+    }
+
+    void UpdatePlayerArmedStatus(bool isArmed)
+    {
+        playerArmed = isArmed;
     }
 }

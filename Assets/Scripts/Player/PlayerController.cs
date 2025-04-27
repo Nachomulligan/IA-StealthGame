@@ -1,17 +1,22 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+using System;
 public class PlayerController : MonoBehaviour
 {
     [Header("Player Controller")]
     FSM<StateEnum> _fsm;
 
+    // NUEVO: evento para avisar a los NPCs
+    public static event Action<bool> OnPlayerArmedChanged;
+    public bool isArmed = false; // NUEVO
+
     private void Awake()
     {
-
         InitializeFSM();
     }
+
     void InitializeFSM()
     {
         _fsm = new FSM<StateEnum>();
@@ -44,6 +49,7 @@ public class PlayerController : MonoBehaviour
 
         _fsm.SetInit(idle);
     }
+
     private void Update()
     {
         if (InputManager.GetKeyAttack())
@@ -57,7 +63,6 @@ public class PlayerController : MonoBehaviour
             TryInteract();
         }
     }
-
 
     [Header("Interaction Settings")]
     [SerializeField] private Transform interactionPoint;
@@ -75,6 +80,9 @@ public class PlayerController : MonoBehaviour
             Destroy(currentWeapon);
         }
         currentWeapon = Instantiate(weapon, weaPoint.position, weaPoint.rotation, weaPoint);
+
+        isArmed = (currentWeapon != null); 
+        OnPlayerArmedChanged?.Invoke(isArmed); 
     }
 
     private void TryInteract()
@@ -98,5 +106,4 @@ public class PlayerController : MonoBehaviour
             }
         }
     }
-
 }

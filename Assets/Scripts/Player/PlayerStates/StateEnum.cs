@@ -10,5 +10,6 @@ public enum StateEnum
     Spin,
     Chase,
     GoZone,
-    Patrol
+    Patrol,
+    Flee
 }
