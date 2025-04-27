@@ -37,4 +37,7 @@ public class NPCModel : PlayerModel
         Gizmos.color = Color.yellow;
         Gizmos.DrawWireSphere(transform.position, pursuitRange);
     }
+
+
+
 }

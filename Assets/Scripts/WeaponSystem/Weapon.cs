@@ -2,15 +2,38 @@ using UnityEngine;
 
 public class Weapon : MonoBehaviour
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-        
-    }
+    public float attackRange = 5f;
+    public LayerMask enemyLayer;
 
-    // Update is called once per frame
     void Update()
     {
+        if (Input.GetKeyDown(KeyCode.F))
+        {
+            Attack();
+        }
+    }
+
+    void Attack()
+    {
+        Debug.Log("Performed an attack");
+
+        Collider[] hitEnemies = Physics.OverlapSphere(transform.position, attackRange, enemyLayer);
+
+        foreach (Collider enemyCollider in hitEnemies)
+        {
+            EnemyDeath enemy = enemyCollider.GetComponent<EnemyDeath>();
+            if (enemy != null)
+            {
+                enemy.Die();
+            }
+        }
+    }
+
+    private void OnDrawGizmosSelected()
+    {
         
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireSphere(transform.position, attackRange);
     }
 }
+

@@ -1121,6 +1121,40 @@ Transform:
   - {fileID: 1209939086}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &349756516 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 3169414732572980433, guid: 9ea1a9a0831417949a4ac752be4406d0, type: 3}
+  m_PrefabInstance: {fileID: 1828345984}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &349756525
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 349756516}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0bb4abe42dc16424f869b66e52981ab7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &349756526
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 349756516}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9218a5631bd5b0645b2f488b13e4acac, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  playerHasWeapon: 0
+  chaseWeightWithWeapon: 60
+  evadeWeightWithWeapon: 40
+  hasSeenPlayerFirstTime: 0
+  shouldEvade: 0
 --- !u!1 &448089628
 GameObject:
   m_ObjectHideFlags: 0
@@ -3419,7 +3453,7 @@ Transform:
   m_GameObject: {fileID: 963194225}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: -0.000000015573887, z: 0, w: 1}
-  m_LocalPosition: {x: 11.869713, y: 5.32, z: -10.359172}
+  m_LocalPosition: {x: 11.869713, y: 3.22, z: -10.359172}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -3762,7 +3796,7 @@ Transform:
   m_GameObject: {fileID: 1022594130}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 11.869713, y: 5.32, z: -10.359172}
+  m_LocalPosition: {x: 11.869713, y: 3.22, z: -10.359172}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -3782,7 +3816,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Damping: {x: 0, y: 0, z: 0}
   ShoulderOffset: {x: 0, y: 0.2, z: -3.5}
-  VerticalArmLength: 3.5
+  VerticalArmLength: 1.4
   CameraSide: 1
   CameraDistance: 1
   AvoidObstacles:
@@ -6574,10 +6608,20 @@ PrefabInstance:
       propertyPath: 'patrolWaypoints.Array.data[1]'
       value: 
       objectReference: {fileID: 568709281}
+    - target: {fileID: 5024502304421211338, guid: 9ea1a9a0831417949a4ac752be4406d0, type: 3}
+      propertyPath: pursuitRange
+      value: 9
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 3169414732572980433, guid: 9ea1a9a0831417949a4ac752be4406d0, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 349756525}
+    - targetCorrespondingSourceObject: {fileID: 3169414732572980433, guid: 9ea1a9a0831417949a4ac752be4406d0, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 349756526}
   m_SourcePrefab: {fileID: 100100000, guid: 9ea1a9a0831417949a4ac752be4406d0, type: 3}
 --- !u!1 &1895395803
 GameObject:
