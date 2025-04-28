@@ -7,6 +7,23 @@ public class NPCModel : PlayerModel
     public LayerMask enemyMask;
     ObstacleAvoidance _obs;
     ILook _look;
+    private void OnEnable()
+    {
+        EventManager.OnNPCDeath += HandleNPCDeath;
+    }
+
+    private void OnDisable()
+    {
+
+        EventManager.OnNPCDeath -= HandleNPCDeath;
+    }
+    private void HandleNPCDeath(NPCModel npc)
+    {
+        if (npc == this) 
+        {
+            Die();
+        }
+    }
 
     protected override void Awake()
     {
@@ -30,6 +47,7 @@ public class NPCModel : PlayerModel
     }
     public void Die()
     {
+        Debug.Log("NPC " + name + " ha muerto.");
         Destroy(gameObject);
     }
     private void OnDrawGizmosSelected()
@@ -44,3 +62,4 @@ public class NPCModel : PlayerModel
 
 
 }
+

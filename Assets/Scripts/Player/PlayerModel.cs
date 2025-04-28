@@ -23,11 +23,14 @@ public class PlayerModel : MonoBehaviour, IMove, IAttack
     {
         UnityEngine.Debug.Log("¡Player realizó un ataque!");
         var colls = Physics.OverlapSphere(Position, playerAttackRange, enemyLayer);
-        for (int i = 0; i < colls.Length; i++)
+        foreach (var collider in colls)
         {
-            GameObject.Destroy(colls[i].gameObject);
+            var npc = collider.GetComponent<NPCModel>();
+            if (npc != null)
+            {
+                EventManager.InvokeNPCDeath(npc);
+            }
         }
-
         _onAttack();
 
     }
