@@ -51,4 +51,10 @@ public class PlayerController : MonoBehaviour
         }
         _fsm.OnExecute();
     }
+
+    public void Die()
+    {
+        Debug.Log("The player died.");
+        Destroy(gameObject);
+    }
 }
