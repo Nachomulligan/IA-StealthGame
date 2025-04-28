@@ -80,7 +80,7 @@ public class NPCController : MonoBehaviour
 
         var stateList = new List<PSBase<StateEnum>> { idle, patrol, attack, chase, goZone, evade };
 
-        // Transiciones
+        // Transitions
         idle.AddTransition(StateEnum.Chase, chase);
         idle.AddTransition(StateEnum.Spin, attack);
         idle.AddTransition(StateEnum.GoZone, goZone);
@@ -113,15 +113,18 @@ public class NPCController : MonoBehaviour
 
         _fsm.SetInit(idle);
     }
-
+   
+    //initialize desicion tree
     void InitializedTree()
     {
+        //idle transition node w timer
         var idle = new ActionNode(() =>
         {
             _fsm.Transition(StateEnum.Idle);
             StartCoroutine(idleTime());
         });
 
+        //patrol transition node w timer
         var patrol = new ActionNode(() =>
         {
             _fsm.Transition(StateEnum.Patrol);
@@ -151,12 +154,13 @@ public class NPCController : MonoBehaviour
         _root = qTargetInView;
     }
 
+    //Questions
     bool QuestionTargetInPursuitRange()
     {
         if (target == null) return false;
         bool inRange = Vector3.Distance(_model.Position, target.position) <= _model.pursuitRange;
         if (!inRange)
-            _isChasing = false; // Si está fuera de rango, deja de perseguir
+            _isChasing = false; // Out of range, come back
         return inRange;
     }
 
@@ -192,6 +196,7 @@ public class NPCController : MonoBehaviour
         return _patrolTimeOut;
     }
 
+    //timers
     public IEnumerator idleTime()
     {
         _restTimeOut = false;

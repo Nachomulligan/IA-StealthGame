@@ -4,12 +4,12 @@ public class WeaponPickUp : MonoBehaviour, Iinteractable
 {
     public GameObject Weapon;
     private PlayerController player;
-    private PlayerModel playerModel; // <-- NUEVO
+    private PlayerModel playerModel; 
 
     private void Start()
     {
         player = ServiceLocator.Instance.GetService<PlayerController>();
-        playerModel = ServiceLocator.Instance.GetService<PlayerModel>(); // <-- Buscamos al modelo
+        playerModel = ServiceLocator.Instance.GetService<PlayerModel>(); 
     }
 
     public void interaction()
@@ -19,7 +19,7 @@ public class WeaponPickUp : MonoBehaviour, Iinteractable
             player.EquipWeapon(Weapon);
             if (playerModel != null)
             {
-                playerModel.EnableAttack(); // <-- Habilitamos ataque cuando recoge
+                playerModel.EnableAttack();
             }
 
             gameObject.SetActive(false);

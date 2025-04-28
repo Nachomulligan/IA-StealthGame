@@ -17,7 +17,7 @@ public class RouletteWheelSystem : MonoBehaviour
             return _instance;
         }
     }
-
+    //singleton
     private void Awake()
     {
         if (_instance == null)

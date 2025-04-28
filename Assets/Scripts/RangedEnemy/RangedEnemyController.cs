@@ -114,14 +114,18 @@ public class RangedEnemysController : MonoBehaviour
         _fsm.SetInit(idle);
     }
 
+    //initialize desicion tree
     void InitializedTree()
     {
+        //idle transition node w timer
+
         var idle = new ActionNode(() =>
         {
             _fsm.Transition(StateEnum.Idle);
             StartCoroutine(idleTime());
         });
 
+        //patrol transition node w timer
         var patrol = new ActionNode(() =>
         {
             _fsm.Transition(StateEnum.Patrol);
@@ -150,13 +154,14 @@ public class RangedEnemysController : MonoBehaviour
 
         _root = qTargetInView;
     }
-
+    
+    //Questions
     bool QuestionTargetInPursuitRange()
     {
         if (target == null) return false;
         bool inRange = Vector3.Distance(_model.Position, target.position) <= _model.pursuitRange;
         if (!inRange)
-            _isChasing = false;
+            _isChasing = false; // Out of range, come back
         return inRange;
     }
 
@@ -192,6 +197,7 @@ public class RangedEnemysController : MonoBehaviour
         return _patrolTimeOut;
     }
 
+    //timers
     public IEnumerator idleTime()
     {
         _restTimeOut = false;

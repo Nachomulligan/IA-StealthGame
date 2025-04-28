@@ -1697,8 +1697,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playerHasWeapon: 0
-  chaseWeightWithWeapon: 60
-  evadeWeightWithWeapon: 40
+  chaseWeightWithWeapon: 70
+  evadeWeightWithWeapon: 30
   hasSeenPlayerFirstTime: 0
   shouldEvade: 0
 --- !u!1 &3228715066654085674
