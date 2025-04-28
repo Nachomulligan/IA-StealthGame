@@ -16,6 +16,7 @@ GameObject:
   - component: {fileID: 851622818423058720}
   - component: {fileID: -373059804792013951}
   - component: {fileID: -4913178025557301191}
+  - component: {fileID: -164984246491288812}
   m_Layer: 8
   m_Name: RangedEnemy
   m_TagString: Untagged
@@ -162,6 +163,11 @@ MonoBehaviour:
   enemyMask:
     serializedVersion: 2
     m_Bits: 0
+  bulletPrefab: {fileID: 0}
+  firePoint: {fileID: 0}
+  bulletSpeed: 10
+  bulletLifetime: 3
+  bulletDamage: 10
 --- !u!114 &-4913178025557301191
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -182,6 +188,23 @@ MonoBehaviour:
   _patrolTimeOut: 0
   restTime: 5
   waitTime: 5
+--- !u!114 &-164984246491288812
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3169414732572980433}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9218a5631bd5b0645b2f488b13e4acac, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  playerHasWeapon: 0
+  chaseWeightWithWeapon: 60
+  evadeWeightWithWeapon: 40
+  hasSeenPlayerFirstTime: 0
+  shouldEvade: 0
 --- !u!1001 &816939758842564647
 PrefabInstance:
   m_ObjectHideFlags: 0

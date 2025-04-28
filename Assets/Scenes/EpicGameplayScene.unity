@@ -7929,8 +7929,16 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 568709281}
     - target: {fileID: 5024502304421211338, guid: 9ea1a9a0831417949a4ac752be4406d0, type: 3}
+      propertyPath: speed
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 5024502304421211338, guid: 9ea1a9a0831417949a4ac752be4406d0, type: 3}
       propertyPath: pursuitRange
       value: 9
+      objectReference: {fileID: 0}
+    - target: {fileID: 5024502304421211338, guid: 9ea1a9a0831417949a4ac752be4406d0, type: 3}
+      propertyPath: enemyLayer.m_Bits
+      value: 64
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

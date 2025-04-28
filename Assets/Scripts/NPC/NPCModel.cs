@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 public class NPCModel : PlayerModel, IDamageable
 {
@@ -36,7 +36,11 @@ public class NPCModel : PlayerModel, IDamageable
         var colls = Physics.OverlapSphere(Position, attackRange, enemyMask);
         for (int i = 0; i < colls.Length; i++)
         {
-            GameObject.Destroy(colls[i].gameObject);
+            PlayerController playerController = colls[i].GetComponent<PlayerController>();
+            if (playerController != null)
+            {
+                playerController.Die();
+            }
         }
     }
     public override void Move(Vector3 dir)
