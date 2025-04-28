@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class NPCModel : PlayerModel
+public class NPCModel : PlayerModel, IDamageable
 {
     public float attackRange;
    [SerializeField] public float pursuitRange;
@@ -14,12 +14,12 @@ public class NPCModel : PlayerModel
 
     private void OnDisable()
     {
-
         EventManager.OnNPCDeath -= HandleNPCDeath;
     }
-    private void HandleNPCDeath(NPCModel npc)
+
+    private void HandleNPCDeath(IDamageable damageable)
     {
-        if (npc == this) 
+        if ((object)damageable == this)
         {
             Die();
         }

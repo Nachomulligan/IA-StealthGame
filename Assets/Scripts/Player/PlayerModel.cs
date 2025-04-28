@@ -36,15 +36,17 @@ public class PlayerModel : MonoBehaviour, IMove, IAttack
         }
 
         UnityEngine.Debug.Log("¡Player realizó un ataque!");
-        var colls = Physics.OverlapSphere(Position, playerAttackRange, enemyLayer);
-        foreach (var collider in colls)
+
+        var colls = Physics.OverlapSphere(transform.position, playerAttackRange, enemyLayer);
+        foreach (var col in colls)
         {
-            var npc = collider.GetComponent<NPCModel>();
-            if (npc != null)
+            var damageable = col.GetComponent<IDamageable>();
+            if (damageable != null)
             {
-                EventManager.InvokeNPCDeath(npc);
+                EventManager.InvokeNPCDeath(damageable);
             }
         }
+
         _onAttack();
     }
 

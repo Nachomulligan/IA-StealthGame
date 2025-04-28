@@ -17,9 +17,9 @@ public class RangedEnemyModel : PlayerModel
 
         EventManager.OnNPCDeath -= HandleNPCDeath;
     }
-    private void HandleNPCDeath(NPCModel npc)
+    private void HandleNPCDeath(IDamageable damageable)
     {
-        if (npc == this)
+        if ((object)damageable == this)
         {
             Die();
         }

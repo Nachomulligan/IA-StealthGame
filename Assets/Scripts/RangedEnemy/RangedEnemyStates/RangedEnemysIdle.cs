@@ -8,20 +8,19 @@ public class RangedEnemysIdle<T> : RangedEnemysBase<T>
     {
         base.Enter();
         _move.Move(Vector3.zero);
-        _currentAngle = 0f; // Reseteamos el ángulo al entrar al idle
+        _currentAngle = 0f; 
     }
 
     public override void Execute()
     {
         base.Execute();
 
-        // Aumentamos el ángulo con el tiempo
-        _currentAngle += 30f * Time.deltaTime; // 30 grados por segundo (ajustalo como quieras)
+        float radians = _currentAngle * Mathf.Deg2Rad;
 
-        // Convertimos el ángulo a un vector de dirección en el plano XZ
-        Vector3 dir = new Vector3(Mathf.Cos(_currentAngle), 0, Mathf.Sin(_currentAngle));
+        _currentAngle += 30f * Time.deltaTime; 
 
-        // Aplicamos la dirección de mirada
+        Vector3 dir = new Vector3(Mathf.Cos(radians), 0, Mathf.Sin(radians));
+
         _look.LookDir(dir.normalized);
     }
 
