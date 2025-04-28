@@ -17,7 +17,7 @@ public class RangedEnemyReactionSystem : MonoBehaviour
     [Tooltip("¿Ya ha visto al jugador por primera vez?")]
     public bool hasSeenPlayerFirstTime = false;
 
-    [Tooltip("Decisión tomada: ¿Debería evadir?")]
+    [Tooltip("Decisión tomada: ¿Deberú} evadir?")]
     public bool shouldEvade = false;
 
 
@@ -37,9 +37,9 @@ public class RangedEnemyReactionSystem : MonoBehaviour
     }
 
     /// <summary>
-    /// Determina si el NPC debería evadir al jugador basado en si tiene un arma
+    /// Determina si el NPC deberú} evadir al jugador basado en si tiene un arma
     /// </summary>
-    /// <returns>True si debería evadir, False si debería perseguir</returns>
+    /// <returns>True si deberú} evadir, False si deberú} perseguir</returns>
     public bool DecideIfShouldEvade()
     {
         // Si ya hemos tomado esta decisión, mantenerla
