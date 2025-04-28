@@ -11,9 +11,11 @@ public class InputManager
     }
     public static Vector2 GetMove()
     {
-        return new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
+        Vector2 move = new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
+        if (move.magnitude > 1)
+            move.Normalize();
+        return move;
     }
-
 }
 
 

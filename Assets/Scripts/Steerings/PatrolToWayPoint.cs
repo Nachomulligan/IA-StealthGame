@@ -63,13 +63,13 @@ public class PatrolToWaypoints : ISteering
         {
             _currentIndex = _waypoints.Count - 2;
             _patrolDirection = -1;
-            _completedCycle = true; // 🚩 Patrulla ida completada
+            _completedCycle = true; 
         }
         else if (_currentIndex < 0)
         {
             _currentIndex = 1;
             _patrolDirection = 1;
-            _completedCycle = true; // 🚩 Patrulla vuelta completada
+            _completedCycle = true; 
         }
     }
 
