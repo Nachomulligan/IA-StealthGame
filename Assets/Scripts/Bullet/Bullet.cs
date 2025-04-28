@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 
 public class Bullet : MonoBehaviour
 {
@@ -19,33 +19,34 @@ public class Bullet : MonoBehaviour
 
     private void Update()
     {
+        if (target != null)
+        {
+            transform.Translate(Vector3.forward * speed * Time.deltaTime);
+        }
+        else
+        {
+
+            transform.Translate(Vector3.forward * speed * Time.deltaTime);
+        }
+
+
         lifeTimer += Time.deltaTime;
         if (lifeTimer >= lifetime)
         {
             Destroy(gameObject);
-            return;
-        }
-
-        if (target != null)
-        {
-            Vector3 direction = (target.position - transform.position).normalized;
-            transform.LookAt(target);
-            transform.position += direction * speed * Time.deltaTime;
-        }
-        else
-        {
-            transform.Translate(Vector3.forward * speed * Time.deltaTime);
         }
     }
 
     private void OnTriggerEnter(Collider other)
     {
+
         if (other.CompareTag("Player"))
         {
             PlayerController playerController = other.GetComponent<PlayerController>();
             if (playerController != null)
             {
                 playerController.Die();
+
                 Destroy(gameObject);
             }
         }
