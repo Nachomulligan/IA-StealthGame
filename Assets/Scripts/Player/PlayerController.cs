@@ -52,8 +52,16 @@ public class PlayerController : MonoBehaviour
     {
         if (InputManager.GetKeyAttack())
         {
-            _fsm.Transition(StateEnum.Spin);
+            if (isArmed) 
+            {
+                _fsm.Transition(StateEnum.Spin);
+            }
+            else
+            {
+                Debug.Log("Dosent have an attack, cant attack");
+            }
         }
+
         _fsm.OnExecute();
 
         if (Input.GetKeyDown(KeyCode.E))
