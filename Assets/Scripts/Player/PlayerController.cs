@@ -16,7 +16,8 @@ public class PlayerController : MonoBehaviour
     private void Awake()
     {
         InitializeFSM();
-        _gm = FindFirstObjectByType<gameManager>();
+   
+        ServiceLocator.Instance.Register<PlayerController>(this);
     }
 
     void InitializeFSM()
@@ -145,11 +146,9 @@ public class PlayerController : MonoBehaviour
             }
         }
     }
-
-
-
     public void Die()
     {
+        _gm = ServiceLocator.Instance.GetService<gameManager>();
         Debug.Log("The player has died.");
         Destroy(gameObject);
         _gm._isDead = true;

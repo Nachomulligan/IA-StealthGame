@@ -17,9 +17,12 @@ public class PlayerModel : MonoBehaviour, IMove, IAttack
     public Action OnAttack { get => _onAttack; set => _onAttack = value; }
     public Vector3 Position => transform.position;
 
+
+
     protected virtual void Awake()
     {
         _rb = GetComponent<Rigidbody>();
+        ServiceLocator.Instance.Register<PlayerModel>(this);
     }
 
     public void EnableAttack()

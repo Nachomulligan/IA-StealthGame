@@ -8,8 +8,8 @@ public class WeaponPickUp : MonoBehaviour, Iinteractable
 
     private void Start()
     {
-        player = FindFirstObjectByType<PlayerController>();
-        playerModel = FindFirstObjectByType<PlayerModel>(); // <-- Buscamos al modelo
+        player = ServiceLocator.Instance.GetService<PlayerController>();
+        playerModel = ServiceLocator.Instance.GetService<PlayerModel>(); // <-- Buscamos al modelo
     }
 
     public void interaction()

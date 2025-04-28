@@ -1634,10 +1634,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7c8dc6501e0f2ae4284ac7a3985d2392, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxObs: 2
-  radius: 3.17
+  maxObs: 15
+  radius: 4
   angle: 227.6
-  personalArea: 0.72
+  personalArea: 1
   obsMask:
     serializedVersion: 2
     m_Bits: 128

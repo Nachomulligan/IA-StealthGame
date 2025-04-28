@@ -16,6 +16,12 @@ public class gameManager : MonoBehaviour
     
     public bool _isDead;
 
+
+    private void Awake()
+    {
+        ServiceLocator.Instance.Register<gameManager>(this);
+    }
+
     private void Start()
     {
         otherText.SetActive(true);

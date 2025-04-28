@@ -31,7 +31,7 @@ public class NPCModel : PlayerModel, IDamageable
     {
         _obs = GetComponent<ObstacleAvoidance>();
         _look = GetComponent<ILook>();
-        _gm = FindFirstObjectByType<gameManager>();
+
         base.Awake();
     }
     public override void Attack()
@@ -54,6 +54,7 @@ public class NPCModel : PlayerModel, IDamageable
     }
     public void Die()
     {
+        _gm = ServiceLocator.Instance.GetService<gameManager>();
         Debug.Log("NPC " + name + " ha muerto.");
         _gm._enemiesDone += 1;
         Destroy(gameObject);
