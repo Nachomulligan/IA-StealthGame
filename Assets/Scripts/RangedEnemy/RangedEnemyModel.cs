@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class RangedEnemyModel : PlayerModel
+public class RangedEnemyModel : PlayerModel, IDamageable
 {
     public float attackRange;
     [SerializeField] public float pursuitRange;
