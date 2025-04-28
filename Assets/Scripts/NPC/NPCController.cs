@@ -19,6 +19,7 @@ public class NPCController : MonoBehaviour
     private ISteering _evadeSteering;
     public bool _restTimeOut;
     public bool _patrolTimeOut;
+    private bool _isChasing;
     public int restTime = 5;
     public int waitTime = 5;
     private NPCReactionSystem _reactionSystem;
@@ -128,7 +129,10 @@ public class NPCController : MonoBehaviour
         });
 
         var attack = new ActionNode(() => _fsm.Transition(StateEnum.Spin));
-        var chase = new ActionNode(() => _fsm.Transition(StateEnum.Chase));
+        var chase = new ActionNode(() => {
+            _isChasing = true; 
+            _fsm.Transition(StateEnum.Chase);
+        });
         var goZone = new ActionNode(() => _fsm.Transition(StateEnum.GoZone));
         var evade = new ActionNode(() => _fsm.Transition(StateEnum.Evade));
 
@@ -142,7 +146,7 @@ public class NPCController : MonoBehaviour
 
         var qCurrentlyPatrolling = new QuestionNode(() => _fsm.CurrState() is NPCSPatrol<StateEnum>, qIsTired, qIsRested);
 
-        var qTargetInView = new QuestionNode(() => QuestionTargetInView(), qShouldEvade, qCurrentlyPatrolling);
+        var qTargetInView = new QuestionNode(() => QuestionTargetInView() || _isChasing, qShouldEvade, qCurrentlyPatrolling);
 
         _root = qTargetInView;
     }
@@ -150,8 +154,12 @@ public class NPCController : MonoBehaviour
     bool QuestionTargetInPursuitRange()
     {
         if (target == null) return false;
-        return Vector3.Distance(_model.Position, target.position) <= _model.pursuitRange;
+        bool inRange = Vector3.Distance(_model.Position, target.position) <= _model.pursuitRange;
+        if (!inRange)
+            _isChasing = false; // Si está fuera de rango, deja de perseguir
+        return inRange;
     }
+
     bool QuestionShouldEvade()
     {
         return _reactionSystem.DecideIfShouldEvade();

@@ -1326,11 +1326,11 @@ PrefabInstance:
       objectReference: {fileID: 1901259038}
     - target: {fileID: 5024502304421211338, guid: 9ea1a9a0831417949a4ac752be4406d0, type: 3}
       propertyPath: attackRange
-      value: 0
+      value: 1.99
       objectReference: {fileID: 0}
     - target: {fileID: 5024502304421211338, guid: 9ea1a9a0831417949a4ac752be4406d0, type: 3}
       propertyPath: pursuitRange
-      value: 7.52
+      value: 14.82
       objectReference: {fileID: 0}
     - target: {fileID: 5024502304421211338, guid: 9ea1a9a0831417949a4ac752be4406d0, type: 3}
       propertyPath: enemyLayer.m_Bits

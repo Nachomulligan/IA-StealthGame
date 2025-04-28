@@ -19,6 +19,7 @@ public class RangedEnemysController : MonoBehaviour
     private ISteering _evadeSteering;
     public bool _restTimeOut;
     public bool _patrolTimeOut;
+    private bool _isChasing;
     public int restTime = 5;
     public int waitTime = 5;
     private NPCReactionSystem _reactionSystem;
@@ -128,7 +129,10 @@ public class RangedEnemysController : MonoBehaviour
         });
 
         var attack = new ActionNode(() => _fsm.Transition(StateEnum.Spin));
-        var chase = new ActionNode(() => _fsm.Transition(StateEnum.Chase));
+        var chase = new ActionNode(() => {
+            _isChasing = true;
+            _fsm.Transition(StateEnum.Chase);
+        });
         var goZone = new ActionNode(() => _fsm.Transition(StateEnum.GoZone));
         var evade = new ActionNode(() => _fsm.Transition(StateEnum.Evade));
 
@@ -140,9 +144,9 @@ public class RangedEnemysController : MonoBehaviour
         var qIsTired = new QuestionNode(() => QuestionIsTired(), idle, patrol);
         var qIsRested = new QuestionNode(() => QuestionIsRested(), patrol, idle);
 
-        var qCurrentlyPatrolling = new QuestionNode(() => _fsm.CurrState() is RangedEnemysPatrol<StateEnum>, qIsTired, qIsRested);
+        var qCurrentlyPatrolling = new QuestionNode(() => _fsm.CurrState() is NPCSPatrol<StateEnum>, qIsTired, qIsRested);
 
-        var qTargetInView = new QuestionNode(() => QuestionTargetInView(), qShouldEvade, qCurrentlyPatrolling);
+        var qTargetInView = new QuestionNode(() => QuestionTargetInView() || _isChasing, qShouldEvade, qCurrentlyPatrolling);
 
         _root = qTargetInView;
     }
@@ -150,8 +154,12 @@ public class RangedEnemysController : MonoBehaviour
     bool QuestionTargetInPursuitRange()
     {
         if (target == null) return false;
-        return Vector3.Distance(_model.Position, target.position) <= _model.pursuitRange;
+        bool inRange = Vector3.Distance(_model.Position, target.position) <= _model.pursuitRange;
+        if (!inRange)
+            _isChasing = false;
+        return inRange;
     }
+
     bool QuestionShouldEvade()
     {
         return _reactionSystem.DecideIfShouldEvade();
