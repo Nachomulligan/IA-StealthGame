@@ -87,8 +87,14 @@ public class PlayerController : MonoBehaviour
         }
         currentWeapon = Instantiate(weapon, weaPoint.position, weaPoint.rotation, weaPoint);
 
-        isArmed = (currentWeapon != null); 
-        OnPlayerArmedChanged?.Invoke(isArmed); 
+        isArmed = (currentWeapon != null);
+        OnPlayerArmedChanged?.Invoke(isArmed);
+
+        var playerModel = GetComponent<PlayerModel>();
+        if (playerModel != null)
+        {
+            playerModel.EnableAttack();
+        }
     }
 
     private void TryInteract()
