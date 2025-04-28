@@ -172,4 +172,11 @@ public class PlayerController : MonoBehaviour
             Cursor.visible = false;
         }
     }
+
+    public void Die()
+    {
+        Debug.Log("The player has died.");
+        Destroy(gameObject);
+    }
+
 }
