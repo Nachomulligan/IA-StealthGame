@@ -1,12 +1,29 @@
 using UnityEngine;
 
-public class Flee : Seek
+public class Flee : ISteering
 {
-    public Flee(Transform self, Transform target) : base(self, target)
+    private Transform _self;
+    private Transform _target;
+    private float _fleeDistance; 
+
+    public Flee(Transform self, Transform target, float fleeDistance = 5f)
     {
+        _self = self;
+        _target = target;
+        _fleeDistance = fleeDistance;
     }
-    public override Vector3 GetDir()
+
+    public Vector3 GetDir()
     {
-        return -base.GetDir();
+        Vector3 dir = _self.position - _target.position;
+
+        if (dir.magnitude < _fleeDistance)
+        {
+            return dir.normalized;
+        }
+        else
+        {
+            return Vector3.zero; 
+        }
     }
 }
