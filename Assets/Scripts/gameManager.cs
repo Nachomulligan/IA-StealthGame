@@ -1,12 +1,16 @@
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
+using TMPro;
 
 public class gameManager : MonoBehaviour
 {
     [SerializeField] private GameObject pauseMenu;
     [SerializeField] private GameObject vMenu;
     [SerializeField] private GameObject gOMenu;
+    [SerializeField] private TextMeshProUGUI counter;
+    [SerializeField] private GameObject otherText;
+
     private bool isPaused = false;
     public int _enemiesDone = 0;
     
@@ -14,7 +18,10 @@ public class gameManager : MonoBehaviour
 
     private void Start()
     {
+        otherText.SetActive(true);
+        counter.gameObject.SetActive(true);
         Time.timeScale = 1.0f;
+        _enemiesDone = 0;
     }
     private void Update()
     {
@@ -23,17 +30,19 @@ public class gameManager : MonoBehaviour
             TogglePause();
         }
 
-        if(_enemiesDone >= 20)
+        if (_enemiesDone >= 20)
         {
             Victory();
         }
 
-        if(_isDead == true)
+        if (_isDead == true)
         {
             GameOver();
         }
 
+        counter.text = _enemiesDone.ToString();
     }
+
 
     public void TogglePause()
     {
@@ -58,12 +67,17 @@ public class gameManager : MonoBehaviour
     {
         gOMenu.SetActive(true);
         Time.timeScale = 0f;
+        otherText.SetActive(false);
+        counter.gameObject.SetActive(false);
+
     }
 
     public void Victory()
     {
         vMenu.SetActive(true);
         Time.timeScale = 0f;
+        otherText.SetActive(false);
+        counter.gameObject.SetActive(false);
     }
 
     public void ResumeGame()
