@@ -55,8 +55,8 @@ public class NPCModel : PlayerModel, IDamageable
     public void Die()
     {
         Debug.Log("NPC " + name + " ha muerto.");
+        _gm._enemiesDone += 1;
         Destroy(gameObject);
-        _gm._enemiesDone = +1;
     }
     private void OnDrawGizmosSelected()
     {

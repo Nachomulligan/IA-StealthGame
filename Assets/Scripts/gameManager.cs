@@ -30,7 +30,7 @@ public class gameManager : MonoBehaviour
             TogglePause();
         }
 
-        if (_enemiesDone >= 20)
+        if (_enemiesDone >= 10)
         {
             Victory();
         }

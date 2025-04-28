@@ -5,13 +5,13 @@ public class RangedEnemyModel : PlayerModel, IDamageable
     public float attackRange;
     [SerializeField] public float pursuitRange;
     public LayerMask enemyMask;
-    [SerializeField] private GameObject bulletPrefab; // Prefab de la bala
-    [SerializeField] private Transform firePoint; // Punto desde donde se dispara la bala
-    [SerializeField] private float bulletSpeed = 10f; // Velocidad de la bala
-    [SerializeField] private float bulletLifetime = 3f; // Tiempo de vida de la bala
-    [SerializeField] private int bulletDamage = 10; // Da?o que hace la bala
-
-    private Transform playerTransform; // Referencia al jugador
+    [SerializeField] private GameObject bulletPrefab;
+    [SerializeField] private Transform firePoint;
+    [SerializeField] private float bulletSpeed = 10f;
+    [SerializeField] private float bulletLifetime = 3f;
+    [SerializeField] private int bulletDamage = 10; 
+    private gameManager _gm;
+    private Transform playerTransform;
     ObstacleAvoidance _obs;
     ILook _look;
 
@@ -37,9 +37,9 @@ public class RangedEnemyModel : PlayerModel, IDamageable
     {
         _obs = GetComponent<ObstacleAvoidance>();
         _look = GetComponent<ILook>();
+        _gm = FindFirstObjectByType<gameManager>();
         base.Awake();
 
-        // Buscar al jugador
         playerTransform = GameObject.FindGameObjectWithTag("Player")?.transform;
     }
 
@@ -47,10 +47,7 @@ public class RangedEnemyModel : PlayerModel, IDamageable
     {
         if (playerTransform != null && bulletPrefab != null && firePoint != null)
         {
-            // Mirar hacia el jugador
             _look.LookDir((playerTransform.position - transform.position).normalized);
-
-            // Instanciar la bala
             GameObject bulletObj = Instantiate(bulletPrefab, firePoint.position, firePoint.rotation);
             Bullet bullet = bulletObj.GetComponent<Bullet>();
 
@@ -71,6 +68,7 @@ public class RangedEnemyModel : PlayerModel, IDamageable
     public void Die()
     {
         Debug.Log("Enemigo a distancia " + name + " ha muerto.");
+        _gm._enemiesDone += 1;
         Destroy(gameObject);
     }
 
