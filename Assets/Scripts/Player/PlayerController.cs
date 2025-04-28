@@ -12,7 +12,7 @@ public class PlayerController : MonoBehaviour
 
 
     public static event Action<bool> OnPlayerArmedChanged;
-    public bool isArmed = false; // NUEVO
+    public bool isArmed = false; 
     private void Awake()
     {
         InitializeFSM();
@@ -34,10 +34,10 @@ public class PlayerController : MonoBehaviour
         var spin = new PSSpin<StateEnum>(StateEnum.Idle);
 
         idle.AddTransition(StateEnum.Walk, walk);
-        idle.AddTransition(StateEnum.Spin, spin);
+        idle.AddTransition(StateEnum.Attack, spin);
 
         walk.AddTransition(StateEnum.Idle, idle);
-        walk.AddTransition(StateEnum.Spin, spin);
+        walk.AddTransition(StateEnum.Attack, spin);
 
         spin.AddTransition(StateEnum.Idle, idle);
 
@@ -59,7 +59,7 @@ public class PlayerController : MonoBehaviour
         {
             if (isArmed) 
             {
-                _fsm.Transition(StateEnum.Spin);
+                _fsm.Transition(StateEnum.Attack);
             }
             else
             {
@@ -80,7 +80,7 @@ public class PlayerController : MonoBehaviour
         {
             if (isArmed)
             {
-                _fsm.Transition(StateEnum.Spin);
+                _fsm.Transition(StateEnum.Attack);
             }
             else
             {

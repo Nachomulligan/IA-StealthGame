@@ -82,7 +82,7 @@ public class RangedEnemysController : MonoBehaviour
 
         // Transiciones
         idle.AddTransition(StateEnum.Chase, chase);
-        idle.AddTransition(StateEnum.Spin, attack);
+        idle.AddTransition(StateEnum.Attack, attack);
         idle.AddTransition(StateEnum.GoZone, goZone);
         idle.AddTransition(StateEnum.Patrol, patrol);
         idle.AddTransition(StateEnum.Evade, evade);
@@ -92,12 +92,12 @@ public class RangedEnemysController : MonoBehaviour
         attack.AddTransition(StateEnum.GoZone, goZone);
 
         chase.AddTransition(StateEnum.Idle, idle);
-        chase.AddTransition(StateEnum.Spin, attack);
+        chase.AddTransition(StateEnum.Attack, attack);
         chase.AddTransition(StateEnum.GoZone, goZone);
         chase.AddTransition(StateEnum.Patrol, patrol);
 
         goZone.AddTransition(StateEnum.Chase, chase);
-        goZone.AddTransition(StateEnum.Spin, attack);
+        goZone.AddTransition(StateEnum.Attack, attack);
         goZone.AddTransition(StateEnum.Idle, idle);
 
         patrol.AddTransition(StateEnum.Idle, idle);
@@ -132,7 +132,7 @@ public class RangedEnemysController : MonoBehaviour
             StartCoroutine(patrolTimer());
         });
 
-        var attack = new ActionNode(() => _fsm.Transition(StateEnum.Spin));
+        var attack = new ActionNode(() => _fsm.Transition(StateEnum.Attack));
         var chase = new ActionNode(() => {
             _isChasing = true;
             _fsm.Transition(StateEnum.Chase);

@@ -7,7 +7,7 @@ public enum StateEnum
     Default,
     Idle,
     Walk,
-    Spin,
+    Attack,
     Chase,
     GoZone,
     Patrol,

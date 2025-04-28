@@ -12,7 +12,7 @@ public class PlayerModel : MonoBehaviour, IMove, IAttack
     public float playerAttackRange = 5f;
     public LayerMask enemyLayer;
 
-    private bool _canAttack = false; // <-- IMPORTANTE: nuevo bool para controlar
+    private bool _canAttack = false;
 
     public Action OnAttack { get => _onAttack; set => _onAttack = value; }
     public Vector3 Position => transform.position;
@@ -27,7 +27,7 @@ public class PlayerModel : MonoBehaviour, IMove, IAttack
 
     public void EnableAttack()
     {
-        _canAttack = true; // <-- Método para habilitar el ataque
+        _canAttack = true; 
     }
 
     public virtual void Attack()
