@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
+//Generic Type Generic
 public class ServiceLocator
 {
     private static ServiceLocator _instance;

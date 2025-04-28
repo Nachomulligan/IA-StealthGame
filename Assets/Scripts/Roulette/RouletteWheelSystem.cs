@@ -4,6 +4,8 @@ using UnityEngine;
 public class RouletteWheelSystem : MonoBehaviour
 {
     private static RouletteWheelSystem _instance;
+
+ 
     public static RouletteWheelSystem Instance
     {
         get
@@ -17,7 +19,7 @@ public class RouletteWheelSystem : MonoBehaviour
             return _instance;
         }
     }
-
+    //singleton
     private void Awake()
     {
         if (_instance == null)
@@ -30,12 +32,10 @@ public class RouletteWheelSystem : MonoBehaviour
             Destroy(gameObject);
         }
     }
-
     public float Range(float min, float max)
     {
         return min + Random.value * (max - min);
     }
-
     public T Roulette<T>(Dictionary<T, float> items)
     {
         float total = 0;

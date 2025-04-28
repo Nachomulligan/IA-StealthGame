@@ -23,21 +23,18 @@ public class NPCController : MonoBehaviour
     public int restTime = 5;
     public int waitTime = 5;
     private NPCReactionSystem _reactionSystem;
-
     private void Awake()
     {
         _model = GetComponent<NPCModel>();
         _los = GetComponent<LineOfSightMono>();
         _reactionSystem = GetComponent<NPCReactionSystem>();
     }
-
     void Start()
     {
         InitializedSteering();
         InitializedFSM();
         InitializedTree();
     }
-
     void Update()
     {
         if (target != null)
@@ -46,12 +43,10 @@ public class NPCController : MonoBehaviour
             _root.Execute();
         }
     }
-
     private void FixedUpdate()
     {
         _fsm.OnFixExecute();
     }
-
     void InitializedSteering()
     {
         _chaseSteering = new Pursuit(_model.transform, target, 0, timePrediction);
@@ -65,7 +60,6 @@ public class NPCController : MonoBehaviour
         }
         _patrolSteering = new PatrolToWaypoints(waypoints, _model.transform, 0.5f);
     }
-
     void InitializedFSM()
     {
         _fsm = new FSM<StateEnum>();
@@ -80,7 +74,7 @@ public class NPCController : MonoBehaviour
 
         var stateList = new List<PSBase<StateEnum>> { idle, patrol, attack, chase, goZone, evade };
 
-        // Transiciones
+        // Transitions
         idle.AddTransition(StateEnum.Chase, chase);
         idle.AddTransition(StateEnum.Spin, attack);
         idle.AddTransition(StateEnum.GoZone, goZone);
@@ -113,15 +107,17 @@ public class NPCController : MonoBehaviour
 
         _fsm.SetInit(idle);
     }
-
+    //initialize desicion tree
     void InitializedTree()
     {
+        //idle transition node w timer
         var idle = new ActionNode(() =>
         {
             _fsm.Transition(StateEnum.Idle);
             StartCoroutine(idleTime());
         });
 
+        //patrol transition node w timer
         var patrol = new ActionNode(() =>
         {
             _fsm.Transition(StateEnum.Patrol);
@@ -141,6 +137,7 @@ public class NPCController : MonoBehaviour
         var qShouldEvade = new QuestionNode(QuestionShouldEvade, evade, qCanAttack);
         var qGoToZone = new QuestionNode(() => QuestionGoToZone(), goZone, idle);
 
+        //patrol and player in view node
         var qIsTired = new QuestionNode(() => QuestionIsTired(), idle, patrol);
         var qIsRested = new QuestionNode(() => QuestionIsRested(), patrol, idle);
 
@@ -150,55 +147,48 @@ public class NPCController : MonoBehaviour
 
         _root = qTargetInView;
     }
-
+    //bools
     bool QuestionTargetInPursuitRange()
     {
         if (target == null) return false;
         bool inRange = Vector3.Distance(_model.Position, target.position) <= _model.pursuitRange;
         if (!inRange)
-            _isChasing = false; // Si está fuera de rango, deja de perseguir
+            _isChasing = false; // Out of range, come back
         return inRange;
     }
-
     bool QuestionShouldEvade()
     {
         return _reactionSystem.DecideIfShouldEvade();
     }
-
     bool QuestionCanAttack()
     {
         if (target == null) return false;
         return Vector3.Distance(_model.Position, target.position) <= _model.attackRange;
     }
-
     bool QuestionGoToZone()
     {
         return Vector3.Distance(_model.transform.position, zone.transform.position) > 0.25f;
     }
-
     bool QuestionTargetInView()
     {
         if (target == null) return false;
         return _los.LOS(target.transform);
     }
-
     bool QuestionIsRested()
     {
         return _restTimeOut;
     }
-
     bool QuestionIsTired()
     {
         return _patrolTimeOut;
     }
-
+    //timers
     public IEnumerator idleTime()
     {
         _restTimeOut = false;
         yield return new WaitForSeconds(waitTime);
         _restTimeOut = true;
     }
-
     public IEnumerator patrolTimer()
     {
         _patrolTimeOut = false;

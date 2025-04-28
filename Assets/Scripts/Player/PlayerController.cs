@@ -9,8 +9,6 @@ public class PlayerController : MonoBehaviour
     [Header("Player Controller")]
     FSM<StateEnum> _fsm;
     private gameManager _gm;
-
-
     public static event Action<bool> OnPlayerArmedChanged;
     public bool isArmed = false; // NUEVO
     private void Awake()
@@ -19,7 +17,6 @@ public class PlayerController : MonoBehaviour
    
         ServiceLocator.Instance.Register<PlayerController>(this);
     }
-
     void InitializeFSM()
     {
         _fsm = new FSM<StateEnum>();
@@ -52,7 +49,6 @@ public class PlayerController : MonoBehaviour
 
         _fsm.SetInit(idle);
     }
-
     private void Update()
     {
         if (InputManager.GetKeyAttack())
@@ -73,9 +69,6 @@ public class PlayerController : MonoBehaviour
         {
             TryInteract();
         }
-
-
-      
         if (InputManager.GetKeyAttack())
         {
             if (isArmed)
@@ -87,7 +80,6 @@ public class PlayerController : MonoBehaviour
                 Debug.Log("Doesn't have an attack, can't attack");
             }
         }
-
         _fsm.OnExecute();
 
         if (Input.GetKeyDown(KeyCode.E))
@@ -103,7 +95,6 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float interactionRadius = 1f;
     [SerializeField] private LayerMask interactionLayer;
     private Collider[] interactables = new Collider[4];
-
     [SerializeField] private Transform weaPoint;
     [SerializeField] private GameObject currentWeapon;
 
@@ -124,7 +115,6 @@ public class PlayerController : MonoBehaviour
             playerModel.EnableAttack();
         }
     }
-
     private void TryInteract()
     {
         Debug.Log("Tried interaction");

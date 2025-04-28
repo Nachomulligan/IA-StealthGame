@@ -19,12 +19,10 @@ public class RangedEnemyModel : PlayerModel, IDamageable
     {
         EventManager.OnNPCDeath += HandleNPCDeath;
     }
-
     private void OnDisable()
     {
         EventManager.OnNPCDeath -= HandleNPCDeath;
     }
-
     private void HandleNPCDeath(IDamageable damageable)
     {
         if ((object)damageable == this)
@@ -32,17 +30,12 @@ public class RangedEnemyModel : PlayerModel, IDamageable
             Die();
         }
     }
-
     protected override void Awake()
     {
         _obs = GetComponent<ObstacleAvoidance>();
         _look = GetComponent<ILook>();
-        _gm = FindFirstObjectByType<gameManager>();
         base.Awake();
-
-        playerTransform = GameObject.FindGameObjectWithTag("Player")?.transform;
     }
-
     public override void Attack()
     {
         if (playerTransform != null && bulletPrefab != null && firePoint != null)
@@ -57,21 +50,19 @@ public class RangedEnemyModel : PlayerModel, IDamageable
             }
         }
     }
-
     public override void Move(Vector3 dir)
     {
         dir = _obs.GetDir(dir);
         _look.LookDir(dir);
         base.Move(dir);
     }
-
     public void Die()
     {
-        Debug.Log("Enemigo a distancia " + name + " ha muerto.");
+        Debug.Log("Enemy" + name + " dead");
+        _gm = ServiceLocator.Instance.GetService<gameManager>();
         _gm._enemiesDone += 1;
         Destroy(gameObject);
     }
-
     private void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.red;

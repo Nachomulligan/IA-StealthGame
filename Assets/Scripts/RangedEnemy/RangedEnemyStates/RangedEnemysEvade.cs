@@ -18,9 +18,8 @@ public class RangedEnemysEvade<T> : RangedEnemysBase<T>
             Debug.LogWarning("Steering is NULL");
             return;
         }
-
         Vector3 direction = _steering.GetDir();
-        Debug.Log($"[evade STATE] Direction: {direction}");
+        Debug.Log($"evade {direction}");
 
         if (_move == null)
         {

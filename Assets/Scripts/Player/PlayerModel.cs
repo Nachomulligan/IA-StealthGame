@@ -11,13 +11,9 @@ public class PlayerModel : MonoBehaviour, IMove, IAttack
     private Action _onAttack = delegate { };
     public float playerAttackRange = 5f;
     public LayerMask enemyLayer;
-
-    private bool _canAttack = false; // <-- IMPORTANTE: nuevo bool para controlar
-
+    private bool _canAttack = false; 
     public Action OnAttack { get => _onAttack; set => _onAttack = value; }
     public Vector3 Position => transform.position;
-
-
 
     protected virtual void Awake()
     {
@@ -27,18 +23,18 @@ public class PlayerModel : MonoBehaviour, IMove, IAttack
 
     public void EnableAttack()
     {
-        _canAttack = true; // <-- Método para habilitar el ataque
+        _canAttack = true; 
     }
-
     public virtual void Attack()
     {
+        //attack based on having a weapon
         if (!_canAttack)
         {
-            UnityEngine.Debug.Log("No puedes atacar, no tienes un arma.");
+            UnityEngine.Debug.Log("Cant attack");
             return;
         }
 
-        UnityEngine.Debug.Log("¡Player realizó un ataque!");
+        UnityEngine.Debug.Log("attacked");
 
         var colls = Physics.OverlapSphere(transform.position, playerAttackRange, enemyLayer);
         foreach (var col in colls)
@@ -49,10 +45,8 @@ public class PlayerModel : MonoBehaviour, IMove, IAttack
                 EventManager.InvokeNPCDeath(damageable);
             }
         }
-
         _onAttack();
     }
-
     public virtual void Move(Vector3 dir)
     {
         dir *= speed;

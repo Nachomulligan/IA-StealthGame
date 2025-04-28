@@ -13,9 +13,7 @@ public class gameManager : MonoBehaviour
 
     private bool isPaused = false;
     public int _enemiesDone = 0;
-    
     public bool _isDead;
-
 
     private void Awake()
     {
@@ -48,8 +46,6 @@ public class gameManager : MonoBehaviour
 
         counter.text = _enemiesDone.ToString();
     }
-
-
     public void TogglePause()
     {
         isPaused = !isPaused;
@@ -68,7 +64,6 @@ public class gameManager : MonoBehaviour
             Cursor.visible = false;
         }
     }
-
     public void GameOver ()
     {
         gOMenu.SetActive(true);
@@ -77,7 +72,6 @@ public class gameManager : MonoBehaviour
         counter.gameObject.SetActive(false);
 
     }
-
     public void Victory()
     {
         vMenu.SetActive(true);
@@ -85,7 +79,6 @@ public class gameManager : MonoBehaviour
         otherText.SetActive(false);
         counter.gameObject.SetActive(false);
     }
-
     public void ResumeGame()
     {
         if (isPaused)
@@ -93,13 +86,11 @@ public class gameManager : MonoBehaviour
             TogglePause();
         }
     }
-
     public void ExitToMenu()
     {
-        Time.timeScale = 1f; // Por si acaso seguimos en pausa
-        SceneManager.LoadScene("MainMenu"); // Asegúrate que el nombre es el correcto
+        Time.timeScale = 1f; 
+        SceneManager.LoadScene("MainMenu"); 
     }
-
     public void QuitGame()
     {
         Application.Quit();

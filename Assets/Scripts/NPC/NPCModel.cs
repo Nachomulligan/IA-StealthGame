@@ -13,12 +13,10 @@ public class NPCModel : PlayerModel, IDamageable
     {
         EventManager.OnNPCDeath += HandleNPCDeath;
     }
-
     private void OnDisable()
     {
         EventManager.OnNPCDeath -= HandleNPCDeath;
     }
-
     private void HandleNPCDeath(IDamageable damageable)
     {
         if ((object)damageable == this)
@@ -26,12 +24,10 @@ public class NPCModel : PlayerModel, IDamageable
             Die();
         }
     }
-
     protected override void Awake()
     {
         _obs = GetComponent<ObstacleAvoidance>();
         _look = GetComponent<ILook>();
-
         base.Awake();
     }
     public override void Attack()
@@ -55,7 +51,7 @@ public class NPCModel : PlayerModel, IDamageable
     public void Die()
     {
         _gm = ServiceLocator.Instance.GetService<gameManager>();
-        Debug.Log("NPC " + name + " ha muerto.");
+        Debug.Log("NPC " + name + " dead.");
         _gm._enemiesDone += 1;
         Destroy(gameObject);
     }
@@ -67,8 +63,5 @@ public class NPCModel : PlayerModel, IDamageable
         Gizmos.color = Color.yellow;
         Gizmos.DrawWireSphere(transform.position, pursuitRange);
     }
-
-
-
 }
 
