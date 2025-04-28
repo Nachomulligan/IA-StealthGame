@@ -6,7 +6,9 @@ public class NPCModel : PlayerModel, IDamageable
    [SerializeField] public float pursuitRange;
     public LayerMask enemyMask;
     ObstacleAvoidance _obs;
+    private gameManager _gm;
     ILook _look;
+
     private void OnEnable()
     {
         EventManager.OnNPCDeath += HandleNPCDeath;
@@ -29,6 +31,7 @@ public class NPCModel : PlayerModel, IDamageable
     {
         _obs = GetComponent<ObstacleAvoidance>();
         _look = GetComponent<ILook>();
+        _gm = FindFirstObjectByType<gameManager>();
         base.Awake();
     }
     public override void Attack()
@@ -53,6 +56,7 @@ public class NPCModel : PlayerModel, IDamageable
     {
         Debug.Log("NPC " + name + " ha muerto.");
         Destroy(gameObject);
+        _gm._enemiesDone = +1;
     }
     private void OnDrawGizmosSelected()
     {

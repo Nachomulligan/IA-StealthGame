@@ -151,10 +151,10 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 2016849347}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0.000030518, y: 0}
-  m_SizeDelta: {x: 1502.3113, y: 961.8088}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: -0.052001953, y: 0.5}
+  m_SizeDelta: {x: 1635.0693, y: 950.999}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &134991863
 MonoBehaviour:
@@ -475,10 +475,10 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 2016849347}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.31730217, y: 0.554}
-  m_AnchorMax: {x: 0.49460432, y: 0.6504455}
-  m_AnchoredPosition: {x: 53, y: -0.021087646}
-  m_SizeDelta: {x: 2.9746704, y: -0.3446045}
+  m_AnchorMin: {x: 0.17789929, y: 0.554}
+  m_AnchorMax: {x: 0.771, y: 0.6504455}
+  m_AnchoredPosition: {x: -51, y: -0.021087646}
+  m_SizeDelta: {x: -460.02533, y: -0.3446045}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1148951146
 MonoBehaviour:
@@ -639,7 +639,7 @@ MonoBehaviour:
     m_SelectOnRight: {fileID: 0}
   m_Transition: 1
   m_Colors:
-    m_NormalColor: {r: 0.01886791, g: 0, b: 0, a: 1}
+    m_NormalColor: {r: 0, g: 0, b: 0, a: 1}
     m_HighlightedColor: {r: 1, g: 0, b: 0, a: 1}
     m_PressedColor: {r: 1, g: 0, b: 0, a: 1}
     m_SelectedColor: {r: 1, g: 0, b: 0, a: 1}
