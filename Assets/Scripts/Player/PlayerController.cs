@@ -1,12 +1,15 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 using System;
 public class PlayerController : MonoBehaviour
 {
     [Header("Player Controller")]
     FSM<StateEnum> _fsm;
+    [SerializeField] private GameObject pauseMenu;
+    private bool isPaused = false;
 
     public static event Action<bool> OnPlayerArmedChanged;
     public bool isArmed = false; // NUEVO
@@ -68,6 +71,38 @@ public class PlayerController : MonoBehaviour
         {
             TryInteract();
         }
+
+
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            TogglePause();
+        }
+
+        if (isPaused)
+        {
+            return; // Si está pausado, NO ejecutamos el FSM
+        }
+
+        if (InputManager.GetKeyAttack())
+        {
+            if (isArmed)
+            {
+                _fsm.Transition(StateEnum.Spin);
+            }
+            else
+            {
+                Debug.Log("Doesn't have an attack, can't attack");
+            }
+        }
+
+        _fsm.OnExecute();
+
+        if (Input.GetKeyDown(KeyCode.E))
+        {
+            TryInteract();
+        }
+
+
     }
 
     [Header("Interaction Settings")]
@@ -116,6 +151,25 @@ public class PlayerController : MonoBehaviour
             {
                 interactableComponent.interaction();
             }
+        }
+    }
+
+    private void TogglePause()
+    {
+        isPaused = !isPaused;
+        pauseMenu.SetActive(isPaused);
+
+        if (isPaused)
+        {
+            Time.timeScale = 0f; // Detenemos el tiempo del juego
+            Cursor.lockState = CursorLockMode.None; // Liberamos el mouse
+            Cursor.visible = true;
+        }
+        else
+        {
+            Time.timeScale = 1f; // Volvemos a correr el tiempo
+            Cursor.lockState = CursorLockMode.Locked; // Bloqueamos el mouse de nuevo
+            Cursor.visible = false;
         }
     }
 }
