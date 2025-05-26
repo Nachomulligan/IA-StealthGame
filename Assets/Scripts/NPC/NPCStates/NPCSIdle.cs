@@ -5,7 +5,6 @@ public class NPCSIdle<T> : NPCSBase<T>
     private float _restTimer;
     private float _restDuration;
     private bool _isRested;
-
     public NPCSIdle(float restDuration = 5f)
     {
         _restDuration = restDuration;

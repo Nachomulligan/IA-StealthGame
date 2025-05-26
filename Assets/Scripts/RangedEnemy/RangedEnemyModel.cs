@@ -1,19 +1,13 @@
 using UnityEngine;
 
-public class RangedEnemyModel : PlayerModel, IDamageable
+public class RangedEnemyModel : NPCModel
 {
-    public float attackRange;
-    [SerializeField] public float pursuitRange;
-    public LayerMask enemyMask;
     [SerializeField] private GameObject bulletPrefab;
     [SerializeField] private Transform firePoint;
     [SerializeField] private float bulletSpeed = 10f;
     [SerializeField] private float bulletLifetime = 3f;
     [SerializeField] private int bulletDamage = 10; 
-    private gameManager _gm;
     private Transform playerTransform;
-    ObstacleAvoidance _obs;
-    ILook _look;
 
     private void OnEnable()
     {
@@ -35,9 +29,6 @@ public class RangedEnemyModel : PlayerModel, IDamageable
 
     protected override void Awake()
     {
-        _obs = GetComponent<ObstacleAvoidance>();
-        _look = GetComponent<ILook>();
-        _gm = FindFirstObjectByType<gameManager>();
         base.Awake();
 
         playerTransform = GameObject.FindGameObjectWithTag("Player")?.transform;
@@ -56,20 +47,6 @@ public class RangedEnemyModel : PlayerModel, IDamageable
                 bullet.Initialize(playerTransform, bulletSpeed, bulletLifetime, bulletDamage);
             }
         }
-    }
-
-    public override void Move(Vector3 dir)
-    {
-        dir = _obs.GetDir(dir);
-        _look.LookDir(dir);
-        base.Move(dir);
-    }
-
-    public void Die()
-    {
-        Debug.Log("Enemigo a distancia " + name + " ha muerto.");
-        _gm._enemiesDone += 1;
-        Destroy(gameObject);
     }
 
     private void OnDrawGizmosSelected()

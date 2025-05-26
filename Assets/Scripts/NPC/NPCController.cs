@@ -9,8 +9,8 @@ public class NPCController : MonoBehaviour
     public Transform zone;
     public float timePrediction;
     FSM<StateEnum> _fsm;
-    NPCModel _model;
-    LineOfSightMono _los;
+    protected NPCModel _model;
+    protected LineOfSightMono _los;
     public List<Transform> patrolWaypoints;
     ITreeNode _root;
     ISteering _steering;
@@ -23,9 +23,9 @@ public class NPCController : MonoBehaviour
     private bool _isChasing;
     public int restTime = 5;
     public int waitTime = 5;
-    private NPCReactionSystem _reactionSystem;
+    protected NPCReactionSystem _reactionSystem;
 
-    private void Awake()
+    protected virtual void Awake()
     {
         _model = GetComponent<NPCModel>();
         _los = GetComponent<LineOfSightMono>();
@@ -34,7 +34,6 @@ public class NPCController : MonoBehaviour
 
     void Start()
     {
-        InitializedSteering();
         InitializedFSM();
         InitializedTree();
     }
@@ -50,11 +49,10 @@ public class NPCController : MonoBehaviour
         _fsm.OnFixExecute();
     }
 
-    void InitializedSteering()
+    protected virtual PSBase<StateEnum> CreateIdleState()
     {
-
+        return new NPCSIdle<StateEnum>(restTime);
     }
-
     void InitializedFSM() 
     {
         _fsm = new FSM<StateEnum>();
@@ -149,7 +147,7 @@ public class NPCController : MonoBehaviour
     bool QuestionTargetInPursuitRange()
     {
         if (target == null) return false;
-        bool inRange = Vector3.Distance(_model.Position, target.position) <= _model.pursuitRange;
+        bool inRange = Vector3.Distance(_model.Position, target.position) <= _model.PursuitRange;
         if (!inRange)
             _isChasing = false; // Out of range, come back
         return inRange;

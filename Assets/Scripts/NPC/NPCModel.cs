@@ -3,11 +3,12 @@
 public class NPCModel : PlayerModel, IDamageable
 {
     public float attackRange;
-   [SerializeField] public float pursuitRange;
-    public LayerMask enemyMask;
-    ObstacleAvoidance _obs;
-    private gameManager _gm;
-    ILook _look;
+   [SerializeField] protected float pursuitRange;
+    public float PursuitRange => pursuitRange;
+    protected LayerMask enemyMask;
+    protected ObstacleAvoidance _obs;
+    protected gameManager _gm;
+    protected ILook _look;
 
     private void OnEnable()
     {
@@ -67,8 +68,5 @@ public class NPCModel : PlayerModel, IDamageable
         Gizmos.color = Color.yellow;
         Gizmos.DrawWireSphere(transform.position, pursuitRange);
     }
-
-
-
 }
 
