@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using Unity.IO.LowLevel.Unsafe;
 using UnityEngine;
 
 public class NPCController : MonoBehaviour
@@ -59,7 +60,7 @@ public class NPCController : MonoBehaviour
         _fsm = new FSM<StateEnum>();
         var look = GetComponent<ILook>();
 
-        var idle = new NPCSIdle<StateEnum>();
+        var idle = new NPCSIdle<StateEnum>(restTime);
         var attack = new NPCSAttack<StateEnum>();
         var chase = new NPCSSteering<StateEnum>(new Pursuit(_model.transform, target, 0, timePrediction));
         var goZone = new NPCSSeek<StateEnum>(zone);
@@ -71,8 +72,8 @@ public class NPCController : MonoBehaviour
                 waypoints.Add(wp.position);
         }
 
-        var patrol = new NPCSPatrol<StateEnum>(new PatrolToWaypoints(waypoints, _model.transform, 0.5f));
-        var evade = new NPCSEvade<StateEnum>(new Evade(_model.transform, target, 0, timePrediction)); 
+        var patrol = new NPCSPatrol<StateEnum>(new PatrolToWaypoints(waypoints, _model.transform, 0.5f), 5f);
+        var evade = new NPCSSteering<StateEnum>(new Evade(_model.transform, target, 0, timePrediction)); 
 
         var stateList = new List<PSBase<StateEnum>> { idle, patrol, attack, chase, goZone, evade };
 
@@ -113,19 +114,9 @@ public class NPCController : MonoBehaviour
     //initialize desicion tree
     void InitializedTree()
     {
-        //idle transition node w timer
-        var idle = new ActionNode(() =>
-        {
-            _fsm.Transition(StateEnum.Idle);
-            StartCoroutine(idleTime());
-        });
+        var idle = new ActionNode(() => _fsm.Transition(StateEnum.Idle));
 
-        //patrol transition node w timer
-        var patrol = new ActionNode(() =>
-        {
-            _fsm.Transition(StateEnum.Patrol);
-            StartCoroutine(patrolTimer());
-        });
+        var patrol = new ActionNode(() => _fsm.Transition(StateEnum.Patrol));
 
         var attack = new ActionNode(() => _fsm.Transition(StateEnum.Attack));
         var chase = new ActionNode(() => {
@@ -140,8 +131,12 @@ public class NPCController : MonoBehaviour
         var qCanAttack = new QuestionNode(() => QuestionCanAttack(), attack, qTargetOutOfPursuitRange);
         var qShouldEvade = new QuestionNode(QuestionShouldEvade, evade, qCanAttack);
 
-        var qIsTired = new QuestionNode(() => QuestionIsTired(), idle, patrol);
-        var qIsRested = new QuestionNode(() => QuestionIsRested(), patrol, idle);
+        var qIsTired = new QuestionNode(() =>
+            (_fsm.CurrState() as NPCSPatrol<StateEnum>)?.IsTired ?? false,
+            idle, patrol);
+        var qIsRested = new QuestionNode(() =>
+            (_fsm.CurrState() as NPCSIdle<StateEnum>)?.IsRested ?? false,
+            patrol, idle);
 
         var qCurrentlyPatrolling = new QuestionNode(() => _fsm.CurrState() is NPCSPatrol<StateEnum>, qIsTired, qIsRested);
 
@@ -180,30 +175,5 @@ public class NPCController : MonoBehaviour
     {
         if (target == null) return false;
         return _los.LOS(target.transform);
-    }
-
-    bool QuestionIsRested()
-    {
-        return _restTimeOut;
-    }
-
-    bool QuestionIsTired()
-    {
-        return _patrolTimeOut;
-    }
-
-    //timers
-    public IEnumerator idleTime()
-    {
-        _restTimeOut = false;
-        yield return new WaitForSeconds(waitTime);
-        _restTimeOut = true;
-    }
-
-    public IEnumerator patrolTimer()
-    {
-        _patrolTimeOut = false;
-        yield return new WaitForSeconds(restTime);
-        _patrolTimeOut = true;
     }
 }
