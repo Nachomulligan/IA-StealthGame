@@ -40,11 +40,8 @@ public class NPCController : MonoBehaviour
 
     void Update()
     {
-        if (target != null)
-        {
-            _fsm.OnExecute();
-            _root.Execute();
-        }
+         _fsm.OnExecute();
+         _root.Execute();
     }
 
     private void FixedUpdate()
@@ -54,8 +51,18 @@ public class NPCController : MonoBehaviour
 
     void InitializedSteering()
     {
-        _chaseSteering = new Pursuit(_model.transform, target, 0, timePrediction);
-        _evadeSteering = new Evade(_model.transform, target, 0, timePrediction);
+
+    }
+
+    void InitializedFSM() 
+    {
+        _fsm = new FSM<StateEnum>();
+        var look = GetComponent<ILook>();
+
+        var idle = new NPCSIdle<StateEnum>();
+        var attack = new NPCSAttack<StateEnum>();
+        var chase = new NPCSSteering<StateEnum>(new Pursuit(_model.transform, target, 0, timePrediction));
+        var goZone = new NPCSSeek<StateEnum>(zone);
 
         List<Vector3> waypoints = new List<Vector3>();
         foreach (var wp in patrolWaypoints)
@@ -63,20 +70,9 @@ public class NPCController : MonoBehaviour
             if (wp != null)
                 waypoints.Add(wp.position);
         }
-        _patrolSteering = new PatrolToWaypoints(waypoints, _model.transform, 0.5f);
-    }
 
-    void InitializedFSM()
-    {
-        _fsm = new FSM<StateEnum>();
-        var look = GetComponent<ILook>();
-
-        var idle = new NPCSIdle<StateEnum>();
-        var attack = new NPCSAttack<StateEnum>();
-        var chase = new NPCSSteering<StateEnum>(_chaseSteering);
-        var goZone = new NPCSChase<StateEnum>(zone);
-        var patrol = new NPCSPatrol<StateEnum>(_patrolSteering);
-        var evade = new NPCSEvade<StateEnum>(_evadeSteering); 
+        var patrol = new NPCSPatrol<StateEnum>(new PatrolToWaypoints(waypoints, _model.transform, 0.5f));
+        var evade = new NPCSEvade<StateEnum>(new Evade(_model.transform, target, 0, timePrediction)); 
 
         var stateList = new List<PSBase<StateEnum>> { idle, patrol, attack, chase, goZone, evade };
 
@@ -139,10 +135,10 @@ public class NPCController : MonoBehaviour
         var goZone = new ActionNode(() => _fsm.Transition(StateEnum.GoZone));
         var evade = new ActionNode(() => _fsm.Transition(StateEnum.Evade));
 
-        var qTargetOutOfPursuitRange = new QuestionNode(() => !QuestionTargetInPursuitRange(), patrol, chase);
+        var qGoToZone = new QuestionNode(() => QuestionGoToZone(), goZone, idle);
+        var qTargetOutOfPursuitRange = new QuestionNode(() => !QuestionTargetInPursuitRange(), qGoToZone, chase);
         var qCanAttack = new QuestionNode(() => QuestionCanAttack(), attack, qTargetOutOfPursuitRange);
         var qShouldEvade = new QuestionNode(QuestionShouldEvade, evade, qCanAttack);
-        var qGoToZone = new QuestionNode(() => QuestionGoToZone(), goZone, idle);
 
         var qIsTired = new QuestionNode(() => QuestionIsTired(), idle, patrol);
         var qIsRested = new QuestionNode(() => QuestionIsRested(), patrol, idle);
@@ -151,7 +147,7 @@ public class NPCController : MonoBehaviour
 
         var qTargetInView = new QuestionNode(() => QuestionTargetInView() || _isChasing, qShouldEvade, qCurrentlyPatrolling);
 
-        _root = qTargetInView;
+        _root = new QuestionNode(() => target != null, qTargetInView, idle);;
     }
 
     //Questions

@@ -1,9 +1,9 @@
 using UnityEngine;
 
-public class NPCSChase<T> : NPCSBase<T>
+public class NPCSSeek<T> : NPCSBase<T>
 {
     Transform _target;
-    public NPCSChase(Transform target)
+    public NPCSSeek(Transform target)
     {
         _target = target;
     }
