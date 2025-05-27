@@ -9,7 +9,7 @@ public class Trap : MonoBehaviour
             PlayerController player = other.GetComponent<PlayerController>();
             if (player != null)
             {
-                player.Die();
+                player.KillPlayer();
             }
         }
     }

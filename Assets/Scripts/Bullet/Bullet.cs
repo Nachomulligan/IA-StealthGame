@@ -45,7 +45,7 @@ public class Bullet : MonoBehaviour
             PlayerController playerController = other.GetComponent<PlayerController>();
             if (playerController != null)
             {
-                playerController.Die();
+                playerController.KillPlayer();
                 Destroy(gameObject);
             }
         }

@@ -2,12 +2,11 @@
 
 public class NPCModel : PlayerModel, IDamageable
 {
-    public float attackRange;
-   [SerializeField] protected float pursuitRange;
+    [SerializeField] public float attackRange;
+    [SerializeField] protected float pursuitRange;
     public float PursuitRange => pursuitRange;
-    protected LayerMask enemyMask;
+    [SerializeField] protected LayerMask enemyMask;
     protected ObstacleAvoidance _obs;
-    protected gameManager _gm;
     protected ILook _look;
 
     private void OnEnable()
@@ -43,7 +42,7 @@ public class NPCModel : PlayerModel, IDamageable
             PlayerController playerController = colls[i].GetComponent<PlayerController>();
             if (playerController != null)
             {
-                playerController.Die();
+                playerController.KillPlayer();
             }
         }
     }
@@ -53,9 +52,9 @@ public class NPCModel : PlayerModel, IDamageable
         _look.LookDir(dir);
         base.Move(dir);
     }
-    public void Die()
+    public override void Die()
     {
-        _gm = ServiceLocator.Instance.GetService<gameManager>();
+        var _gm = ServiceLocator.Instance.GetService<gameManager>();
         Debug.Log("NPC " + name + " ha muerto.");
         _gm._enemiesDone += 1;
         Destroy(gameObject);
@@ -69,4 +68,5 @@ public class NPCModel : PlayerModel, IDamageable
         Gizmos.DrawWireSphere(transform.position, pursuitRange);
     }
 }
+
 

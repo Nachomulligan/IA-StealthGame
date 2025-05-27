@@ -23,12 +23,12 @@ public class NPCReactionSystem : MonoBehaviour
 
     private void OnEnable()
     {
-        PlayerController.OnPlayerArmedChanged += UpdateWeaponStatus;
+        PlayerModel.OnPlayerArmedChanged += UpdateWeaponStatus;
     }
 
     private void OnDisable()
     {
-        PlayerController.OnPlayerArmedChanged -= UpdateWeaponStatus;
+        PlayerModel.OnPlayerArmedChanged -= UpdateWeaponStatus;
     }
 
     private void UpdateWeaponStatus(bool isArmed)

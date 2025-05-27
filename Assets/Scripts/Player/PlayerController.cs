@@ -7,16 +7,17 @@ using System;
 public class PlayerController : MonoBehaviour
 {
     [Header("Player Controller")]
-    FSM<StateEnum> _fsm;
+    private FSM<StateEnum> _fsm;
     private gameManager _gm;
 
-
-    public static event Action<bool> OnPlayerArmedChanged;
-    public bool isArmed = false; 
+    private PlayerModel _playerModel;
+    private PlayerInteractionModel _interactionModel;
     private void Awake()
     {
+        _playerModel = GetComponent<PlayerModel>();
+        _interactionModel = GetComponent<PlayerInteractionModel>();
         InitializeFSM();
-   
+
         ServiceLocator.Instance.Register<PlayerController>(this);
     }
 
@@ -57,101 +58,44 @@ public class PlayerController : MonoBehaviour
     {
         if (InputManager.GetKeyAttack())
         {
-            if (isArmed) 
-            {
-                _fsm.Transition(StateEnum.Attack);
-            }
-            else
-            {
-                Debug.Log("Dosent have an attack, cant attack");
-            }
+            HandleAttackInput();
         }
 
         _fsm.OnExecute();
 
         if (Input.GetKeyDown(KeyCode.E))
         {
-            TryInteract();
-        }
-
-
-      
-        if (InputManager.GetKeyAttack())
-        {
-            if (isArmed)
-            {
-                _fsm.Transition(StateEnum.Attack);
-            }
-            else
-            {
-                Debug.Log("Doesn't have an attack, can't attack");
-            }
+            HandleInteractionInput();
         }
 
         _fsm.OnExecute();
-
-        if (Input.GetKeyDown(KeyCode.E))
-        {
-            TryInteract();
-        }
-
-
     }
 
-    [Header("Interaction Settings")]
-    [SerializeField] private Transform interactionPoint;
-    [SerializeField] private float interactionRadius = 1f;
-    [SerializeField] private LayerMask interactionLayer;
-    private Collider[] interactables = new Collider[4];
+    private void HandleAttackInput()
+    {
+        if (_playerModel.IsArmed && _playerModel.CanAttack)
+        {
+            _fsm.Transition(StateEnum.Attack);
+        }
+        else
+        {
+            Debug.Log("Doesn't have an attack, can't attack");
+        }
+    }
 
-    [SerializeField] private Transform weaPoint;
-    [SerializeField] private GameObject currentWeapon;
-
+    private void HandleInteractionInput()
+    {
+        if (_interactionModel != null)
+        {
+            _interactionModel.TryInteract();
+        }
+    }
+    public void KillPlayer()
+    {
+        _playerModel.Die();
+    }
     public void EquipWeapon(GameObject weapon)
     {
-        if (currentWeapon != null)
-        {
-            Destroy(currentWeapon);
-        }
-        currentWeapon = Instantiate(weapon, weaPoint.position, weaPoint.rotation, weaPoint);
-
-        isArmed = (currentWeapon != null);
-        OnPlayerArmedChanged?.Invoke(isArmed);
-
-        var playerModel = GetComponent<PlayerModel>();
-        if (playerModel != null)
-        {
-            playerModel.EnableAttack();
-        }
+        _playerModel.EquipWeapon(weapon);
     }
-
-    private void TryInteract()
-    {
-        Debug.Log("Tried interaction");
-        int elements = Physics.OverlapSphereNonAlloc(interactionPoint.position, interactionRadius, interactables, interactionLayer);
-
-        if (elements == 0)
-        {
-            Debug.Log("No interactables found");
-            return;
-        }
-
-        for (int i = 0; i < elements; i++)
-        {
-            var interactable = interactables[i];
-            var interactableComponent = interactable.GetComponent<Iinteractable>();
-            if (interactableComponent != null)
-            {
-                interactableComponent.interaction();
-            }
-        }
-    }
-    public void Die()
-    {
-        _gm = ServiceLocator.Instance.GetService<gameManager>();
-        Debug.Log("The player has died.");
-        Destroy(gameObject);
-        _gm._isDead = true;
-    }
-
 }
