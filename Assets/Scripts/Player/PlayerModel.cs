@@ -10,6 +10,8 @@ public class PlayerModel : MonoBehaviour, IMove, IAttack
     public float speed;
     public float playerAttackRange = 5f;
     public LayerMask enemyLayer;
+    [SerializeField] private Transform PlayerTransform;
+    public Transform _playerTransform => PlayerTransform;
 
     [Header("Weapon System")]
     [SerializeField] private Transform weaponPoint;
@@ -36,6 +38,7 @@ public class PlayerModel : MonoBehaviour, IMove, IAttack
     {
         _rb = GetComponent<Rigidbody>();
         ServiceLocator.Instance.Register<PlayerModel>(this);
+
     }
 
     public void EquipWeapon(GameObject weapon)
