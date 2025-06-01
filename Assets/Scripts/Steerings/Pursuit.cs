@@ -12,6 +12,11 @@ public class Pursuit : ISteering
         _target = target;
         _timePrediction = timePrediction;
     }
+    public Pursuit(Transform self, float errorRange = 0, float timePrediction = 0)
+    {
+        _self = self;
+        _timePrediction = timePrediction;
+    }
 
     public Pursuit(Transform self, Rigidbody target, float errorRange = 0)
     {
@@ -22,6 +27,10 @@ public class Pursuit : ISteering
     {
         _self = self;
         _target = target;
+    }
+    public Pursuit(Transform self)
+    {
+        _self = self;
     }
 
     public virtual Vector3 GetDir()
@@ -49,5 +58,9 @@ public class Pursuit : ISteering
         {
             _timePrediction = value;
         }
+    }
+    public Rigidbody Target
+    {
+        set => _target = value;
     }
 }

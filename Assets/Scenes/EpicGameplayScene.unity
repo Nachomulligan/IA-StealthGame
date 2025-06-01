@@ -9566,6 +9566,11 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: e41dd7c2b23c3d4469c28997d28ccde2, type: 3}
+--- !u!54 &1751013102 stripped
+Rigidbody:
+  m_CorrespondingSourceObject: {fileID: 2534989359131209644, guid: 1fffdfe564cd4f246b6cbfa0ecf2a7a5, type: 3}
+  m_PrefabInstance: {fileID: 297904569}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &1764289437 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 6065566397332145215, guid: e41dd7c2b23c3d4469c28997d28ccde2, type: 3}
@@ -10652,6 +10657,79 @@ Transform:
   m_Children: []
   m_Father: {fileID: 114928423}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1001 &1919369767
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 1942236589528780379, guid: e221ba1db9080b1479eb4c9229479cdb, type: 3}
+      propertyPath: target
+      value: 
+      objectReference: {fileID: 1751013102}
+    - target: {fileID: 1958960136314430448, guid: e221ba1db9080b1479eb4c9229479cdb, type: 3}
+      propertyPath: speed
+      value: 2.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 3169414732572980433, guid: e221ba1db9080b1479eb4c9229479cdb, type: 3}
+      propertyPath: m_Name
+      value: GoonEnemy
+      objectReference: {fileID: 0}
+    - target: {fileID: 4344532792310664415, guid: e221ba1db9080b1479eb4c9229479cdb, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -49.678326
+      objectReference: {fileID: 0}
+    - target: {fileID: 4344532792310664415, guid: e221ba1db9080b1479eb4c9229479cdb, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 1.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4344532792310664415, guid: e221ba1db9080b1479eb4c9229479cdb, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 61.7904
+      objectReference: {fileID: 0}
+    - target: {fileID: 4344532792310664415, guid: e221ba1db9080b1479eb4c9229479cdb, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.000000104308114
+      objectReference: {fileID: 0}
+    - target: {fileID: 4344532792310664415, guid: e221ba1db9080b1479eb4c9229479cdb, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4344532792310664415, guid: e221ba1db9080b1479eb4c9229479cdb, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4344532792310664415, guid: e221ba1db9080b1479eb4c9229479cdb, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4344532792310664415, guid: e221ba1db9080b1479eb4c9229479cdb, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4344532792310664415, guid: e221ba1db9080b1479eb4c9229479cdb, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: -180.00002
+      objectReference: {fileID: 0}
+    - target: {fileID: 4344532792310664415, guid: e221ba1db9080b1479eb4c9229479cdb, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9130894699993314687, guid: e221ba1db9080b1479eb4c9229479cdb, type: 3}
+      propertyPath: multiplier
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 9130894699993314687, guid: e221ba1db9080b1479eb4c9229479cdb, type: 3}
+      propertyPath: personalArea
+      value: 3.02
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: e221ba1db9080b1479eb4c9229479cdb, type: 3}
 --- !u!1 &1925069233
 GameObject:
   m_ObjectHideFlags: 0
@@ -12580,3 +12658,4 @@ SceneRoots:
   - {fileID: 79868852}
   - {fileID: 1426124680}
   - {fileID: 297904569}
+  - {fileID: 1919369767}

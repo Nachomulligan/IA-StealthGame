@@ -15,7 +15,7 @@ public class ObstacleAvoidance : MonoBehaviour
     {
         _colls = new Collider[maxObs];
     }
-    public Vector3 GetDir(Vector3 currDir)
+    public Vector3 GetDir(Vector3 currDir, bool calculateY = true)
     {
         // Detect nearby obstacles
         int count = Physics.OverlapSphereNonAlloc(Self, radius, _colls, obsMask);
@@ -23,7 +23,7 @@ public class ObstacleAvoidance : MonoBehaviour
         Collider nearColl = null;
         float nearCollDistance = 0;
         Vector3 nearClosestPoint = Vector3.zero;
-
+        if (!calculateY) currDir.y = 0;
         // looks through detected obstacles
         for (int i = 0; i < count; i++)
         {
