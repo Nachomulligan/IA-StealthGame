@@ -1,6 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using Unity.IO.LowLevel.Unsafe;
+using Unity.VisualScripting;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
 public class NPCController : MonoBehaviour
@@ -24,6 +26,10 @@ public class NPCController : MonoBehaviour
     public int restTime = 5;
     public int waitTime = 5;
     protected NPCReactionSystem _reactionSystem;
+    StatePathfinding<StateEnum> _statePathfinding;
+    public Node start;
+    public Node goal;
+
 
     protected virtual void Awake()
     {
@@ -173,5 +179,11 @@ public class NPCController : MonoBehaviour
     {
         if (target == null) return false;
         return _los.LOS(target.transform);
+    }
+    public void ASTARPlusVector()
+    {
+        _statePathfinding.start = start;
+        _statePathfinding.goal = goal;
+        _statePathfinding.SetPathAStarPlusVector();
     }
 }
