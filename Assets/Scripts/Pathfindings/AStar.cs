@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System;
 using UnityEngine;
 
-public class ASTAR : MonoBehaviour
+public class AStar : MonoBehaviour
 {
     public static List<T> Run<T>(T start, Func<T, bool> isSatisfied, Func<T, List<T>> getConnections, Func<T, T, float> getCost, Func<T, float> heuristic, int watchdog = 500, int watchdogPath = 500)
     {
@@ -17,7 +17,7 @@ public class ASTAR : MonoBehaviour
             watchdog--;
             if (watchdog <= 0) break;
             T current = pending.Dequeue();
-            Debug.Log("ASTAR");
+            Debug.Log("AStar");
             if (isSatisfied(current))
             {
                 List<T> path = new List<T>();

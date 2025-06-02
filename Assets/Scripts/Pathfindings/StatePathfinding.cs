@@ -9,6 +9,7 @@ using static UnityEditor.PlayerSettings;
 public class StatePathfinding<T> : StateFollowPoints<T>
 {
     IMove _move;
+    ILook _look;
     Animator _anim;
     public Node start;
     public Node goal;
@@ -30,7 +31,7 @@ public class StatePathfinding<T> : StateFollowPoints<T>
     {
         base.OnMove(dir);
         _move.Move(dir);
-        _move.LookDir(dir);
+        _look.LookDir(dir);
     }
     protected override void OnStartPath()
     {
@@ -43,97 +44,20 @@ public class StatePathfinding<T> : StateFollowPoints<T>
         base.OnFinishPath();
         _anim.SetFloat("Vel", 0);
     }
-    public void SetPathBFS()
-    {
-        List<Node> path = BFS.Run<Node>(start, IsSatisfied, GetConnections, 5000);
-        List<Vector3> pathVector = new List<Vector3>();
-        for (int i = 0; i < path.Count; i++)
-        {
-            pathVector.Add(path[i].transform.position);
-        }
-        Debug.Log("Path " + path.Count);
-        _move.SetPosition(start.transform.position);
-        SetWaypoints(pathVector);
-    }
-    public void SetPathDFS()
-    {
-        List<Node> path = DFS.Run<Node>(start, IsSatisfied, GetConnections, 5000);
-        List<Vector3> pathVector = new List<Vector3>();
-        for (int i = 0; i < path.Count; i++)
-        {
-            pathVector.Add(path[i].transform.position);
-        }
-        Debug.Log("Path " + path.Count);
-        _move.SetPosition(start.transform.position);
-        SetWaypoints(pathVector);
-    }
-    public void SetPathDijkstra()
-    {
-        List<Node> path = DIJKSTRA.Run<Node>(start, IsSatisfied, GetConnections, GetCost);
-        List<Vector3> pathVector = new List<Vector3>();
-        for (int i = 0; i < path.Count; i++)
-        {
-            pathVector.Add(path[i].transform.position);
-        }
-        Debug.Log("Path " + path.Count);
-        _move.SetPosition(start.transform.position);
-        SetWaypoints(pathVector);
-    }
-    public void SetPathAStar()
-    {
-        var init = GetNearNode(_entity.transform.position);
-        goal = GetNearNode(target.transform.position);
-        List<Node> path = ASTAR.Run<Node>(init, IsSatisfied, GetConnections, GetCost, Heuristic);
-        List<Vector3> pathVector = new List<Vector3>();
-        for (int i = 0; i < path.Count; i++)
-        {
-            pathVector.Add(path[i].transform.position);
-        }
-        Debug.Log("Path " + path.Count);
-        //_move.SetPosition(start.transform.position);
-        SetWaypoints(pathVector);
-    }
-    public void SetPathAStarPlus()
-    {
-        var init = GetNearNode(_entity.transform.position);
-        goal = GetNearNode(target.transform.position);
-        List<Node> path = ASTAR.Run<Node>(init, IsSatisfied, GetConnections, GetCost, Heuristic);
-        path = ASTAR.CleanPath(path, InView);
-        List<Vector3> pathVector = new List<Vector3>();
-        for (int i = 0; i < path.Count; i++)
-        {
-            pathVector.Add(path[i].transform.position);
-        }
-        Debug.Log("Path " + path.Count);
-        //_move.SetPosition(start.transform.position);
-        SetWaypoints(pathVector);
-    }
+
 
     public void SetPathAStarPlusVector()
     {
         //goal = Vector3Int.RoundToInt(target.transform.position);
         Vector3 init = Vector3Int.RoundToInt(_entity.transform.position);
-        List<Vector3> path = ASTAR.Run<Vector3>(init, IsSatisfied, GetConnections, GetCost, Heuristic);
-        path = ASTAR.CleanPath(path, InView);
+        List<Vector3> path = AStar.Run<Vector3>(init, IsSatisfied, GetConnections, GetCost, Heuristic);
+        path = AStar.CleanPath(path, InView);
         Debug.Log("Path " + path.Count);
         //_move.SetPosition(start.transform.position);
         SetWaypoints(path);
     }
 
-    public void SetPathThetaStar()
-    {
-        var init = GetNearNode(_entity.transform.position);
-        goal = GetNearNode(target.transform.position);
-        List<Node> path = THETA.Run<Node>(init, IsSatisfied, GetConnections, GetCost, Heuristic, InView);
-        List<Vector3> pathVector = new List<Vector3>();
-        for (int i = 0; i < path.Count; i++)
-        {
-            pathVector.Add(path[i].transform.position);
-        }
-        Debug.Log("Path " + path.Count);
-        //_move.SetPosition(start.transform.position);
-        SetWaypoints(pathVector);
-    }
+    
     bool InView(Node grandparent, Node child)
     {
         return InView(grandparent.transform.position, child.transform.position);
@@ -182,16 +106,9 @@ public class StatePathfinding<T> : StateFollowPoints<T>
         h += Vector3.Distance(current, target.transform.position) * distanceMultiplier;
         return h;
     }
-    float GetCost(Node parent, Node child)
-    {
-        float distanceMultiplier = 1;
-        float trapMultiplier = 100;
 
-        float cost = 0;
-        cost += Vector3.Distance(parent.transform.position, child.transform.position) * distanceMultiplier;
-        cost += child.hasTrap ? trapMultiplier : 0;
-        return cost;
-    }
+
+   
     float GetCost(Vector3 parent, Vector3 child)
     {
         float distanceMultiplier = 1;
@@ -209,10 +126,7 @@ public class StatePathfinding<T> : StateFollowPoints<T>
         if (Vector3.Distance(curr, target.transform.position) > 1.25f) return false;
         return InView(curr, target.transform.position);
     }
-    List<Node> GetConnections(Node curr)
-    {
-        return curr.neightbourds;
-    }
+  
     List<Vector3> GetConnections(Vector3 curr)
     {
         var neightbourds = new List<Vector3>();

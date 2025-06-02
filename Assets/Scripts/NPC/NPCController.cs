@@ -1,4 +1,6 @@
 using System.Collections.Generic;
+using Unity.VisualScripting;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
 public class NPCController : MonoBehaviour
@@ -12,6 +14,9 @@ public class NPCController : MonoBehaviour
     public List<Transform> patrolWaypoints;
     ITreeNode _root;
     ISteering _steering;
+    StatePathfinding<StateEnum> _statePathfinding;
+    public Node start;
+    public Node goal;
     PatrolToWaypoints _waypoints;
     private void Awake()
     {
@@ -130,5 +135,15 @@ public class NPCController : MonoBehaviour
     {
         if (target == null) return false;
         return _los.LOS(target.transform);
+    }
+
+
+    //agregue el astar para el pathfinding
+   
+    public void ASTARPlusVector()
+    {
+        _statePathfinding.start = start;
+        _statePathfinding.goal = goal;
+        _statePathfinding.SetPathAStarPlusVector();
     }
 }
