@@ -45,7 +45,7 @@ public class StatePathfindingSimple<T> : StateFollowPoints<T>
     {
         base.OnMove(dir);
         _move.Move(dir);
-        _look.LookDir(dir);
+        //_look.LookDir(dir);
     }
 
     protected override void OnStartPath()
@@ -113,7 +113,9 @@ public class StatePathfindingSimple<T> : StateFollowPoints<T>
 
     bool IsSatisfied(Vector3 curr)
     {
-        if (Vector3.Distance(curr, _target.transform.position) > 1.25f) return false;
+        var targetPos = _target.position;
+        targetPos.y = curr.y;
+        if (Vector3.Distance(curr, targetPos) > 1.25f) return false;
         return InView(curr, _target.transform.position);
     }
 
