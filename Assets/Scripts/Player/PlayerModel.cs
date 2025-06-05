@@ -4,10 +4,9 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using UnityEngine;
 
-public class PlayerModel : MonoBehaviour, IMove, IAttack
+public class PlayerModel : BaseEntityModel
 {
     [Header("Player Stats")]
-    public float speed;
     public float playerAttackRange = 5f;
     public LayerMask enemyLayer;
     [SerializeField] private Transform PlayerTransform;
@@ -18,27 +17,18 @@ public class PlayerModel : MonoBehaviour, IMove, IAttack
     [SerializeField] private GameObject currentWeapon;
 
     private bool _isArmed = false;
-    private bool _isDead = false;
     private bool _canAttack = false;
-
-
-    private Rigidbody _rb;
-    private Action _onAttack = delegate { };
 
     public static event Action<bool> OnPlayerArmedChanged;
     public static event Action OnPlayerDied;
 
-    public Action OnAttack { get => _onAttack; set => _onAttack = value; }
-    public Vector3 Position => transform.position;
     public bool IsArmed => _isArmed;
-    public bool IsDead => _isDead;
     public bool CanAttack => _canAttack;
 
-    protected virtual void Awake()
+    protected override void Awake()
     {
-        _rb = GetComponent<Rigidbody>();
+        base.Awake();
         ServiceLocator.Instance.Register<PlayerModel>(this);
-
     }
 
     public void EquipWeapon(GameObject weapon)
@@ -57,9 +47,9 @@ public class PlayerModel : MonoBehaviour, IMove, IAttack
         UnityEngine.Debug.Log($"Weapon equipped: {weapon.name}. Player is now armed: {_isArmed}");
     }
 
-    public virtual void Die()
+    public override void Die()
     {
-        if (_isDead) return; // Evitar múltiples muertes
+        if (_isDead) return;
 
         _isDead = true;
         var _gm = ServiceLocator.Instance.GetService<gameManager>();
@@ -75,7 +65,7 @@ public class PlayerModel : MonoBehaviour, IMove, IAttack
         Destroy(gameObject);
     }
 
-    public virtual void Attack()
+    public override void Attack()
     {
         if (!_canAttack)
         {
@@ -96,11 +86,5 @@ public class PlayerModel : MonoBehaviour, IMove, IAttack
         }
 
         _onAttack();
-    }
-    public virtual void Move(Vector3 dir)
-    {
-        dir *= speed;
-        dir.y = _rb.linearVelocity.y;
-        _rb.linearVelocity = dir;
     }
 }

@@ -7,11 +7,11 @@ public class GoonEnemyController : MonoBehaviour
 {
     public Rigidbody target;
     FSM<StateEnum> _fsm;
-    GoonEnemy _magikarp;
+    GoonEnemy _goon;
 
     private void Start()
     {
-        _magikarp = GetComponent<GoonEnemy>();
+        _goon = GetComponent<GoonEnemy>();
         InitializeFSM();
     }
     void InitializeFSM()
@@ -23,7 +23,7 @@ public class GoonEnemyController : MonoBehaviour
         _fsm = new FSM<StateEnum>();
 
         var idle = new GoonStateIdle<StateEnum>();
-        var steering = new GoonStateSteering<StateEnum>(_magikarp, leaderBehaviour, target, flocking, obs);
+        var steering = new GoonStateSteering<StateEnum>(_goon, leaderBehaviour, target, flocking, obs);
 
         idle.AddTransition(StateEnum.Walk, steering);
         steering.AddTransition(StateEnum.Idle, idle);

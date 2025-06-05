@@ -3,57 +3,14 @@ using System.Collections.Generic;
 using Unity.IO.LowLevel.Unsafe;
 using UnityEngine;
 
-public class NPCController : MonoBehaviour
+public class NPCController : BaseEnemyController
 {
-    public Rigidbody target;
-    public Transform zone;
-    public float timePrediction;
-    FSM<StateEnum> _fsm;
-    protected NPCModel _model;
-    protected LineOfSightMono _los;
-    public List<Transform> patrolWaypoints;
-    ITreeNode _root;
-    ISteering _steering;
-    private ISteering _patrolSteering;
-    private ISteering _chaseSteering;
-    private ISteering _goZoneSteering;
-    private ISteering _evadeSteering;
-    public bool _restTimeOut;
-    public bool _patrolTimeOut;
-    private bool _isChasing;
-    public int restTime = 5;
-    public int waitTime = 5;
-    protected NPCReactionSystem _reactionSystem;
-
-    protected virtual void Awake()
+    protected override BaseEnemyModel GetEnemyModel()
     {
-        _model = GetComponent<NPCModel>();
-        _los = GetComponent<LineOfSightMono>();
-        _reactionSystem = GetComponent<NPCReactionSystem>();
+        return GetComponent<NPCModel>();
     }
 
-    void Start()
-    {
-        InitializedFSM();
-        InitializedTree();
-    }
-
-    void Update()
-    {
-         _fsm.OnExecute();
-         _root.Execute();
-    }
-
-    private void FixedUpdate()
-    {
-        _fsm.OnFixExecute();
-    }
-
-    protected virtual PSBase<StateEnum> CreateIdleState()
-    {
-        return new NPCSIdle<StateEnum>(restTime);
-    }
-    void InitializedFSM() 
+    protected override void InitializedFSM()
     {
         _fsm = new FSM<StateEnum>();
         var look = GetComponent<ILook>();
@@ -71,11 +28,11 @@ public class NPCController : MonoBehaviour
         }
 
         var patrol = new NPCSPatrol<StateEnum>(new PatrolToWaypoints(waypoints, _model.transform, 0.5f), 5f);
-        var evade = new NPCSSteering<StateEnum>(new Evade(_model.transform, target, 0, timePrediction)); 
+        var evade = new NPCSSteering<StateEnum>(new Evade(_model.transform, target, 0, timePrediction));
 
         var stateList = new List<PSBase<StateEnum>> { idle, patrol, attack, chase, goZone, evade };
 
-        // Transitions
+        // Configurar transiciones (mismo código que tenías)
         idle.AddTransition(StateEnum.Chase, chase);
         idle.AddTransition(StateEnum.Attack, attack);
         idle.AddTransition(StateEnum.GoZone, goZone);
@@ -108,17 +65,14 @@ public class NPCController : MonoBehaviour
 
         _fsm.SetInit(idle);
     }
-   
-    //initialize desicion tree
-    void InitializedTree()
+
+    protected override void InitializedTree()
     {
         var idle = new ActionNode(() => _fsm.Transition(StateEnum.Idle));
-
         var patrol = new ActionNode(() => _fsm.Transition(StateEnum.Patrol));
-
         var attack = new ActionNode(() => _fsm.Transition(StateEnum.Attack));
         var chase = new ActionNode(() => {
-            _isChasing = true; 
+            _isChasing = true;
             _fsm.Transition(StateEnum.Chase);
         });
         var goZone = new ActionNode(() => _fsm.Transition(StateEnum.GoZone));
@@ -127,7 +81,7 @@ public class NPCController : MonoBehaviour
         var qGoToZone = new QuestionNode(() => QuestionGoToZone(), goZone, idle);
         var qTargetOutOfPursuitRange = new QuestionNode(() => !QuestionTargetInPursuitRange(), qGoToZone, chase);
         var qCanAttack = new QuestionNode(() => QuestionCanAttack(), attack, qTargetOutOfPursuitRange);
-        var qShouldEvade = new QuestionNode(QuestionShouldEvade, evade, qCanAttack);
+        var qShouldEvade = new QuestionNode(() => _reactionSystem.DecideIfShouldEvade(), evade, qCanAttack);
 
         var qIsTired = new QuestionNode(() =>
             (_fsm.CurrState() as NPCSPatrol<StateEnum>)?.IsTired ?? false,
@@ -137,41 +91,8 @@ public class NPCController : MonoBehaviour
             patrol, idle);
 
         var qCurrentlyPatrolling = new QuestionNode(() => _fsm.CurrState() is NPCSPatrol<StateEnum>, qIsTired, qIsRested);
-
         var qTargetInView = new QuestionNode(() => QuestionTargetInView() || _isChasing, qShouldEvade, qCurrentlyPatrolling);
 
-        _root = new QuestionNode(() => target != null, qTargetInView, idle);;
-    }
-
-    //Questions
-    bool QuestionTargetInPursuitRange()
-    {
-        if (target == null) return false;
-        bool inRange = Vector3.Distance(_model.Position, target.position) <= _model.PursuitRange;
-        if (!inRange)
-            _isChasing = false; // Out of range, come back
-        return inRange;
-    }
-
-    bool QuestionShouldEvade()
-    {
-        return _reactionSystem.DecideIfShouldEvade();
-    }
-
-    bool QuestionCanAttack()
-    {
-        if (target == null) return false;
-        return Vector3.Distance(_model.Position, target.position) <= _model.attackRange;
-    }
-
-    bool QuestionGoToZone()
-    {
-        return Vector3.Distance(_model.transform.position, zone.transform.position) > 0.25f;
-    }
-
-    bool QuestionTargetInView()
-    {
-        if (target == null) return false;
-        return _los.LOS(target.transform);
+        _root = new QuestionNode(() => target != null, qTargetInView, idle);
     }
 }

@@ -1,42 +1,14 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
-public class LeaderEnemyController : MonoBehaviour
+public class LeaderEnemyController : BaseEnemyController
 {
-    public Rigidbody target;
-    public Transform zone;
-    public float timePrediction;
-    FSM<StateEnum> _fsm;
-    protected LeaderEnemyModel _model;
-    protected LineOfSightMono _los;
-    public List<Transform> patrolWaypoints;
-    ITreeNode _root;
-    private bool _isChasing;
-
-    protected virtual void Awake()
+    protected override BaseEnemyModel GetEnemyModel()
     {
-        _model = GetComponent<LeaderEnemyModel>();
-        _los = GetComponent<LineOfSightMono>();
+        return GetComponent<LeaderEnemyModel>();
     }
 
-    void Start()
-    {
-        InitializedFSM();
-        InitializedTree();
-    }
-
-    void Update()
-    {
-        _fsm.OnExecute();
-        _root.Execute();
-    }
-
-    private void FixedUpdate()
-    {
-        _fsm.OnFixExecute();
-    }
-
-    void InitializedFSM()
+    protected override void InitializedFSM()
     {
         _fsm = new FSM<StateEnum>();
         var look = GetComponent<ILook>();
@@ -56,7 +28,7 @@ public class LeaderEnemyController : MonoBehaviour
 
         var stateList = new List<PSBase<StateEnum>> { patrol, attack, chase, goZone };
 
-        // Transitions
+        // Transiciones específicas del líder
         attack.AddTransition(StateEnum.Chase, chase);
         attack.AddTransition(StateEnum.GoZone, goZone);
         attack.AddTransition(StateEnum.Patrol, patrol);
@@ -78,10 +50,10 @@ public class LeaderEnemyController : MonoBehaviour
             stateList[i].Initialize(_model, look, _model);
         }
 
-        _fsm.SetInit(patrol); // Inicia directamente en patrol
+        _fsm.SetInit(patrol);
     }
 
-    void InitializedTree()
+    protected override void InitializedTree()
     {
         var patrol = new ActionNode(() => _fsm.Transition(StateEnum.Patrol));
         var attack = new ActionNode(() => _fsm.Transition(StateEnum.Attack));
@@ -91,45 +63,11 @@ public class LeaderEnemyController : MonoBehaviour
         });
         var goZone = new ActionNode(() => _fsm.Transition(StateEnum.GoZone));
 
-        // Pregunta si debe volver a la zona
         var qGoToZone = new QuestionNode(() => QuestionGoToZone(), goZone, patrol);
-
-        // Pregunta si el target est? fuera del rango de pursuit
         var qTargetOutOfPursuitRange = new QuestionNode(() => !QuestionTargetInPursuitRange(), qGoToZone, chase);
-
-        // Pregunta si puede atacar
         var qCanAttack = new QuestionNode(() => QuestionCanAttack(), attack, qTargetOutOfPursuitRange);
-
-        // Pregunta si el target est? en vista
         var qTargetInView = new QuestionNode(() => QuestionTargetInView() || _isChasing, qCanAttack, patrol);
 
         _root = new QuestionNode(() => target != null, qTargetInView, patrol);
-    }
-
-    // Questions
-    bool QuestionTargetInPursuitRange()
-    {
-        if (target == null) return false;
-        bool inRange = Vector3.Distance(_model.Position, target.position) <= _model.PursuitRange;
-        if (!inRange)
-            _isChasing = false; // Fuera de rango, volver
-        return inRange;
-    }
-
-    bool QuestionCanAttack()
-    {
-        if (target == null) return false;
-        return Vector3.Distance(_model.Position, target.position) <= _model.attackRange;
-    }
-
-    bool QuestionGoToZone()
-    {
-        return Vector3.Distance(_model.transform.position, zone.transform.position) > 0.25f;
-    }
-
-    bool QuestionTargetInView()
-    {
-        if (target == null) return false;
-        return _los.LOS(target.transform);
     }
 }

@@ -1,31 +1,15 @@
 ﻿using UnityEngine;
 
-public class RangedEnemyModel : NPCModel
+public class RangedEnemyModel : BaseEnemyModel
 {
+    [Header("Ranged Attack")]
     [SerializeField] private GameObject bulletPrefab;
     [SerializeField] private Transform firePoint;
     [SerializeField] private float bulletSpeed = 10f;
     [SerializeField] private float bulletLifetime = 3f;
-    [SerializeField] private int bulletDamage = 10; 
-    private PlayerModel _player;
+    [SerializeField] private int bulletDamage = 10;
 
-    private void OnEnable()
-    {
-        EventManager.OnNPCDeath += HandleNPCDeath;
-    }
-
-    private void OnDisable()
-    {
-        EventManager.OnNPCDeath -= HandleNPCDeath;
-    }
-
-    private void HandleNPCDeath(IDamageable damageable)
-    {
-        if ((object)damageable == this)
-        {
-            Die();
-        }
-    }
+    [SerializeField] private PlayerModel _player;
 
     protected override void Awake()
     {
@@ -47,13 +31,6 @@ public class RangedEnemyModel : NPCModel
             }
         }
     }
-
-    private void OnDrawGizmosSelected()
-    {
-        Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(transform.position, attackRange);
-
-        Gizmos.color = Color.yellow;
-        Gizmos.DrawWireSphere(transform.position, pursuitRange);
-    }
 }
+
+
