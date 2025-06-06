@@ -4,8 +4,6 @@ using UnityEngine;
 
 public class StatePathfindingSimple<T> : StateFollowPoints<T>
 {
-    private IMove _move;
-    private ILook _look;
     private Transform _target;
     private bool _isPathfindingActive;
 

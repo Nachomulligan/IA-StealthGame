@@ -3959,6 +3959,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 1807989660}
     - target: {fileID: 4615874363923083941, guid: 9ea1a9a0831417949a4ac752be4406d0, type: 3}
+      propertyPath: SearchTarget
+      value: 
+      objectReference: {fileID: 1807989661}
+    - target: {fileID: 4615874363923083941, guid: 9ea1a9a0831417949a4ac752be4406d0, type: 3}
       propertyPath: targetSearching
       value: 
       objectReference: {fileID: 149024018}
@@ -3982,6 +3986,14 @@ PrefabInstance:
       propertyPath: 'patrolWaypoints.Array.data[3]'
       value: 
       objectReference: {fileID: 1912071696}
+    - target: {fileID: 5024502304421211338, guid: 9ea1a9a0831417949a4ac752be4406d0, type: 3}
+      propertyPath: attackRange
+      value: 2.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 5024502304421211338, guid: 9ea1a9a0831417949a4ac752be4406d0, type: 3}
+      propertyPath: pursuitRange
+      value: 5.94
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -5873,7 +5885,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3169414732572980433, guid: 9ea1a9a0831417949a4ac752be4406d0, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4344532792310664415, guid: 9ea1a9a0831417949a4ac752be4406d0, type: 3}
       propertyPath: m_LocalPosition.x

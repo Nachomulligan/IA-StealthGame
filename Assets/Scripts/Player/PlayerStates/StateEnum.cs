@@ -12,5 +12,6 @@ public enum StateEnum
     GoZone,
     Patrol,
     Evade,
-    Pathfinding
+    Pathfinding,
+    Searching
 }

@@ -4,8 +4,6 @@ using static TMPro.SpriteAssetUtilities.TexturePacker_JsonArray;
 
 public class StatePathfinding<T> : StateFollowPoints<T>
 {
-    IMove _move;
-    private ILook _look;
     Animator _anim;
     public Node start;
     public Node goal;

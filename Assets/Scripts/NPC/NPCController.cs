@@ -1,10 +1,13 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using Unity.IO.LowLevel.Unsafe;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 public class NPCController : BaseEnemyController
 {
+    public Transform SearchTarget;
+    private NPCSSearching<StateEnum> searching;
+    //ver si cambiar el negative infinity, antes no estaba
+    private float _lastTimeSawTarget = float.NegativeInfinity;
+    private float _timeTargetVisibleThreshold = 2.5f;
     protected override BaseEnemyModel GetEnemyModel()
     {
         return GetComponent<NPCModel>();
@@ -19,7 +22,7 @@ public class NPCController : BaseEnemyController
         var attack = new NPCSAttack<StateEnum>();
         var chase = new NPCSSteering<StateEnum>(new Pursuit(_model.transform, target, 0, timePrediction));
         var goZone = new NPCSSeek<StateEnum>(zone);
-
+        searching = new NPCSSearching<StateEnum>(_model.transform, 10f);
         List<Vector3> waypoints = new List<Vector3>();
         foreach (var wp in patrolWaypoints)
         {
@@ -30,7 +33,7 @@ public class NPCController : BaseEnemyController
         var patrol = new NPCSPatrol<StateEnum>(new PatrolToWaypoints(waypoints, _model.transform, 0.5f), 5f);
         var evade = new NPCSSteering<StateEnum>(new Evade(_model.transform, target, 0, timePrediction));
 
-        var stateList = new List<PSBase<StateEnum>> { idle, patrol, attack, chase, goZone, evade };
+        var stateList = new List<PSBase<StateEnum>> { idle, patrol, attack, chase, goZone, evade, searching };
 
         // Configurar transiciones (mismo código que tenías)
         idle.AddTransition(StateEnum.Chase, chase);
@@ -38,25 +41,36 @@ public class NPCController : BaseEnemyController
         idle.AddTransition(StateEnum.GoZone, goZone);
         idle.AddTransition(StateEnum.Patrol, patrol);
         idle.AddTransition(StateEnum.Evade, evade);
+        idle.AddTransition(StateEnum.Searching, searching);
 
         attack.AddTransition(StateEnum.Idle, idle);
         attack.AddTransition(StateEnum.Chase, chase);
         attack.AddTransition(StateEnum.GoZone, goZone);
+        attack.AddTransition(StateEnum.Searching, searching);
 
         chase.AddTransition(StateEnum.Idle, idle);
         chase.AddTransition(StateEnum.Attack, attack);
         chase.AddTransition(StateEnum.GoZone, goZone);
         chase.AddTransition(StateEnum.Patrol, patrol);
+        chase.AddTransition(StateEnum.Searching, searching);
+
+        searching.AddTransition(StateEnum.Chase, chase);
+        searching.AddTransition(StateEnum.Attack, attack);
+        searching.AddTransition(StateEnum.GoZone, goZone);
+        searching.AddTransition(StateEnum.Idle, idle);
 
         goZone.AddTransition(StateEnum.Chase, chase);
         goZone.AddTransition(StateEnum.Attack, attack);
         goZone.AddTransition(StateEnum.Idle, idle);
 
+        patrol.AddTransition(StateEnum.Searching, searching);
         patrol.AddTransition(StateEnum.Idle, idle);
         patrol.AddTransition(StateEnum.Chase, chase);
         patrol.AddTransition(StateEnum.Evade, evade);
+        patrol.AddTransition(StateEnum.Searching, searching);
 
         evade.AddTransition(StateEnum.Chase, chase);
+        evade.AddTransition(StateEnum.Searching, searching);
 
         for (int i = 0; i < stateList.Count; i++)
         {
@@ -77,9 +91,21 @@ public class NPCController : BaseEnemyController
         });
         var goZone = new ActionNode(() => _fsm.Transition(StateEnum.GoZone));
         var evade = new ActionNode(() => _fsm.Transition(StateEnum.Evade));
+        var search = new ActionNode(() => {
+            // Ahora podemos acceder directamente al estado de búsqueda
+            if (searching != null && target != null)
+            {
+                searching.SetSearchTarget(SearchTarget);
+            }
+            _fsm.Transition(StateEnum.Searching);
+        });
+
 
         var qGoToZone = new QuestionNode(() => QuestionGoToZone(), goZone, idle);
-        var qTargetOutOfPursuitRange = new QuestionNode(() => !QuestionTargetInPursuitRange(), qGoToZone, chase);
+        var qSearchOver = new QuestionNode(() =>
+         searching?.IsSearchOver ?? false, // Usar la referencia directa
+         qGoToZone, search);
+        var qTargetOutOfPursuitRange = new QuestionNode(() => !QuestionTargetInPursuitRange(), qSearchOver, chase);
         var qCanAttack = new QuestionNode(() => QuestionCanAttack(), attack, qTargetOutOfPursuitRange);
         var qShouldEvade = new QuestionNode(() => _reactionSystem.DecideIfShouldEvade(), evade, qCanAttack);
 
@@ -91,8 +117,21 @@ public class NPCController : BaseEnemyController
             patrol, idle);
 
         var qCurrentlyPatrolling = new QuestionNode(() => _fsm.CurrState() is NPCSPatrol<StateEnum>, qIsTired, qIsRested);
-        var qTargetInView = new QuestionNode(() => QuestionTargetInView() || _isChasing, qShouldEvade, qCurrentlyPatrolling);
+        var qTargetInView = new QuestionNode(() => TargetWasSeenRecently() || _isChasing, qShouldEvade, qCurrentlyPatrolling);
 
         _root = new QuestionNode(() => target != null, qTargetInView, idle);
+    }
+    protected override void Update()
+    {
+        base.Update(); 
+        if (QuestionTargetInView())
+        {
+            _lastTimeSawTarget = Time.time;
+        }
+    }
+
+    private bool TargetWasSeenRecently()
+    {
+        return (Time.time - _lastTimeSawTarget) < _timeTargetVisibleThreshold;
     }
 }

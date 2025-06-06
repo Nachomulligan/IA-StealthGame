@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-public class StateFollowPoints<T> : State<T>
+public class StateFollowPoints<T> : PSBase<T>
 {
     protected List<Vector3> _waypoints;
     int _index;
