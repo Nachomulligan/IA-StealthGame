@@ -1,0 +1,75 @@
+﻿using UnityEngine;
+
+public class GoonStateEvade<T> : State<T>
+{
+    private FlockingManager _flockingManager;
+    private GoonEnemyModel _goon;
+    private Rigidbody _target;
+    private Evade _evade;
+
+    // Timer interno para el evade
+    private float _evadeTimer;
+    private float _evadeDuration;
+    private bool _evadeTimeOver;
+
+    public GoonStateEvade(GoonEnemyModel goon, Rigidbody target, FlockingManager flockingManager, float evadeDuration = 3f)
+    {
+        _flockingManager = flockingManager;
+        _goon = goon;
+        _target = target;
+        _evadeDuration = evadeDuration;
+        _evade = new Evade(goon.transform, target, 0, 1f);
+    }
+
+    public override void Enter()
+    {
+        Debug.Log("evade");
+        base.Enter();
+
+        // Resetear timer al entrar
+        _evadeTimer = 0f;
+        _evadeTimeOver = false;
+
+        _flockingManager.SetFlockingActive(FlockingType.Predator, true);
+        _flockingManager.SetFlockingActive(FlockingType.Avoidance, true);
+
+        _flockingManager.SetFlockingActive(FlockingType.Leader, false);
+
+        _flockingManager.SetFlockingMultiplier(FlockingType.Predator, 10f);
+        _flockingManager.SetFlockingMultiplier(FlockingType.Avoidance, 2f);
+    }
+
+    public override void Execute()
+    {
+        // Actualizar timer
+        _evadeTimer += Time.deltaTime;
+        if (_evadeTimer >= _evadeDuration)
+        {
+            _evadeTimeOver = true;
+        }
+
+        var evadeDir = _evade.GetDir();
+        var flockingDir = _flockingManager.GetDir();
+        var steering = (evadeDir * 2f + flockingDir).normalized;
+        steering.y = 0;
+
+        _goon.Move(steering);
+    }
+
+    public override void Exit()
+    {
+        base.Exit();
+
+        // Resetear timer al salir
+        _evadeTimer = 0f;
+        _evadeTimeOver = false;
+
+        _flockingManager.SetFlockingActive(FlockingType.Predator, false);
+
+        _flockingManager.SetFlockingMultiplier(FlockingType.Predator, 1f);
+        _flockingManager.SetFlockingMultiplier(FlockingType.Avoidance, 1f);
+    }
+
+    // Getter para que el FSM pueda verificar si el tiempo de evade terminó
+    public bool IsEvadeTimeOver => _evadeTimeOver;
+}

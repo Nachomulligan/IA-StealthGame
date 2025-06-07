@@ -18,7 +18,7 @@ public abstract class BaseFlockingEnemyController : BaseController
         return Vector3.Distance(_model.transform.position, zone.transform.position) > 0.25f;
     }
 
-    protected bool QuestionTargetInView()
+    protected virtual bool QuestionTargetInView()
     {
         if (target == null) return false;
         return _los.LOS(target.transform);
