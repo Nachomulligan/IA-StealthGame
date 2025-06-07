@@ -3,6 +3,12 @@ using UnityEngine;
 
 public class Alignment : FlockingBaseBehaviour
 {
+    private void Awake()
+    {
+        if (_flockingType != FlockingType.Alignment)
+            _flockingType = FlockingType.Alignment;
+    }
+
     protected override Vector3 GetRealDir(List<IBoid> boids, IBoid self)
     {
         Vector3 alignment = Vector3.zero;

@@ -3,6 +3,12 @@ using UnityEngine;
 
 public class Cohesion : FlockingBaseBehaviour
 {
+    private void Awake()
+    {
+        if (_flockingType != FlockingType.Cohesion)
+            _flockingType = FlockingType.Cohesion;
+    }
+
     protected override Vector3 GetRealDir(List<IBoid> boids, IBoid self)
     {
         Vector3 cohesion = Vector3.zero;

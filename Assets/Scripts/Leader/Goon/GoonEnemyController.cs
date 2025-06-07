@@ -14,22 +14,23 @@ public class GoonEnemyController : MonoBehaviour
         _goon = GetComponent<GoonEnemy>();
         InitializeFSM();
     }
+
     void InitializeFSM()
     {
-        var leaderBehaviour = GetComponent<LeaderBehaviour>();
         var obs = GetComponent<ObstacleAvoidance>();
-        var flocking = GetComponent<FlockingManager>();
+        var flockingManager = GetComponent<FlockingManager>();
 
         _fsm = new FSM<StateEnum>();
 
         var idle = new GoonStateIdle<StateEnum>();
-        var steering = new GoonStateSteering<StateEnum>(_goon, leaderBehaviour, target, flocking, obs);
+        var steering = new GoonStateSteering<StateEnum>(_goon, target, flockingManager, obs);
 
         idle.AddTransition(StateEnum.Walk, steering);
         steering.AddTransition(StateEnum.Idle, idle);
 
         _fsm.SetInit(steering);
     }
+
     void Update()
     {
         _fsm.OnExecute();

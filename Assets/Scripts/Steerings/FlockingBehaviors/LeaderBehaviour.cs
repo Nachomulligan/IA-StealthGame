@@ -7,11 +7,15 @@ public class LeaderBehaviour : FlockingBaseBehaviour
     Seek _seek;
     Pursuit _pursuit;
     bool _isPursuit;
+
     private void Awake()
     {
         _pursuit = new Pursuit(transform, 0, timePrediction);
         _seek = new Seek(transform);
+        if (_flockingType != FlockingType.Leader)
+            _flockingType = FlockingType.Leader;
     }
+
     protected override Vector3 GetRealDir(List<IBoid> boids, IBoid self)
     {
         if (_isPursuit)
@@ -20,6 +24,7 @@ public class LeaderBehaviour : FlockingBaseBehaviour
         }
         return _seek.GetDir() * multiplier;
     }
+
     public Transform Leader
     {
         set
@@ -37,6 +42,7 @@ public class LeaderBehaviour : FlockingBaseBehaviour
             }
         }
     }
+
     public Rigidbody LeaderRb
     {
         set

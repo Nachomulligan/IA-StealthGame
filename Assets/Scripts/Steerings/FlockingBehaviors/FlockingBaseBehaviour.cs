@@ -5,6 +5,8 @@ public class FlockingBaseBehaviour : MonoBehaviour, IFlocking
 {
     public float multiplier = 1;
     bool _isActive = true;
+    [SerializeField] public FlockingType _flockingType;
+    public FlockingType FlockingType => _flockingType;
     public Vector3 GetDir(List<IBoid> boids, IBoid self)
     {
         if (_isActive)

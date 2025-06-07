@@ -9,10 +9,14 @@ public class PredatorBehaviour : FlockingBaseBehaviour
     public int maxPredators;
     public LayerMask predatorMask;
     Collider[] _colls;
+
     private void Awake()
     {
         _colls = new Collider[maxPredators];
+        if (_flockingType != FlockingType.Predator)
+            _flockingType = FlockingType.Predator;
     }
+
     protected override Vector3 GetRealDir(List<IBoid> boids, IBoid self)
     {
         int count = Physics.OverlapSphereNonAlloc(self.Position, radius, _colls, predatorMask);
@@ -25,6 +29,7 @@ public class PredatorBehaviour : FlockingBaseBehaviour
         }
         return avoidance.normalized * multiplier;
     }
+
     private void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.red;
