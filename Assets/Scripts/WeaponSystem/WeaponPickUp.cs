@@ -1,8 +1,10 @@
 using UnityEngine;
 
+
 public class WeaponPickUp : MonoBehaviour, Iinteractable
 {
-    public GameObject Weapon;
+    public Weapon weaponData;
+
     private PlayerController playerController;
 
     private void Start()
@@ -12,16 +14,15 @@ public class WeaponPickUp : MonoBehaviour, Iinteractable
 
     public void interaction()
     {
-        if (playerController != null && Weapon != null)
+        if (playerController != null && weaponData != null)
         {
-            playerController.EquipWeapon(Weapon);
+            playerController.PickUpWeapon(weaponData);
 
             gameObject.SetActive(false);
-            Debug.Log("Picked Object");
         }
         else
         {
-            Debug.LogWarning("Either PlayerController is not working or there is no Weapon assigned to the Pick Up");
+            Debug.LogWarning("Either PlayerController is not working or there is no WeaponData assigned to the Pick Up");
         }
     }
 }

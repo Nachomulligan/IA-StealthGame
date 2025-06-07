@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-
 using System;
+
 public class PlayerController : MonoBehaviour
 {
     [Header("Player Controller")]
@@ -12,15 +12,18 @@ public class PlayerController : MonoBehaviour
 
     private PlayerModel _playerModel;
     private PlayerInteractionModel _interactionModel;
+    private WeaponInventory _weaponInventory; 
+
     private void Awake()
     {
         _playerModel = GetComponent<PlayerModel>();
         _interactionModel = GetComponent<PlayerInteractionModel>();
+        _weaponInventory = GetComponent<WeaponInventory>(); 
+
         InitializeFSM();
 
         ServiceLocator.Instance.Register<PlayerController>(this);
     }
-
     void InitializeFSM()
     {
         _fsm = new FSM<StateEnum>();
@@ -53,7 +56,6 @@ public class PlayerController : MonoBehaviour
 
         _fsm.SetInit(idle);
     }
-
     private void Update()
     {
         if (InputManager.GetKeyAttack())
@@ -69,8 +71,20 @@ public class PlayerController : MonoBehaviour
         }
 
         _fsm.OnExecute();
-    }
 
+        if (Input.GetKeyDown(KeyCode.Alpha1))
+        {
+            EquipWeaponFromInventory(0);
+        }
+        if (Input.GetKeyDown(KeyCode.Alpha2))
+        {
+            EquipWeaponFromInventory(1);
+        }
+        if (Input.GetKeyDown(KeyCode.Alpha3))
+        {
+            EquipWeaponFromInventory(2);
+        }
+    }
     private void HandleAttackInput()
     {
         if (_playerModel.IsArmed && _playerModel.CanAttack)
@@ -82,7 +96,6 @@ public class PlayerController : MonoBehaviour
             Debug.Log("Doesn't have an attack, can't attack");
         }
     }
-
     private void HandleInteractionInput()
     {
         if (_interactionModel != null)
@@ -90,6 +103,7 @@ public class PlayerController : MonoBehaviour
             _interactionModel.TryInteract();
         }
     }
+
     public void KillPlayer()
     {
         _playerModel.Die();
@@ -97,5 +111,30 @@ public class PlayerController : MonoBehaviour
     public void EquipWeapon(GameObject weapon)
     {
         _playerModel.EquipWeapon(weapon);
+    }
+    public void PickUpWeapon(Weapon weaponData)
+    {
+        if (_weaponInventory != null && weaponData != null)
+        {
+            _weaponInventory.AddWeapon(weaponData);
+            Debug.Log($"Picked up weapon: {weaponData.weaponName}");
+        }
+    }
+
+    public void EquipWeaponFromInventory(int index)
+    {
+        if (_weaponInventory != null)
+        {
+            Weapon weaponToEquip = _weaponInventory.GetWeaponToEquip(index);
+
+            if (weaponToEquip != null)
+            {
+                GameObject weaponInstance = Instantiate(weaponToEquip.weaponPrefab);
+
+                EquipWeapon(weaponInstance);
+
+                Debug.Log($"Equipped weapon: {weaponToEquip.weaponName}");
+            }
+        }
     }
 }
