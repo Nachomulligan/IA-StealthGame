@@ -10933,6 +10933,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 135877124615023086, guid: e221ba1db9080b1479eb4c9229479cdb, type: 3}
+      propertyPath: speed
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 1942236589528780379, guid: e221ba1db9080b1479eb4c9229479cdb, type: 3}
+      propertyPath: zone
+      value: 
+      objectReference: {fileID: 2072652960}
     - target: {fileID: 1942236589528780379, guid: e221ba1db9080b1479eb4c9229479cdb, type: 3}
       propertyPath: target
       value: 
@@ -10985,6 +10993,14 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 7968889567079371110, guid: e221ba1db9080b1479eb4c9229479cdb, type: 3}
+      propertyPath: radius
+      value: 6.35
+      objectReference: {fileID: 0}
+    - target: {fileID: 8283597222554472951, guid: e221ba1db9080b1479eb4c9229479cdb, type: 3}
+      propertyPath: speed
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 9130894699993314687, guid: e221ba1db9080b1479eb4c9229479cdb, type: 3}
       propertyPath: multiplier
       value: 2
@@ -10993,7 +11009,9 @@ PrefabInstance:
       propertyPath: personalArea
       value: 3.02
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 1958960136314430448, guid: e221ba1db9080b1479eb4c9229479cdb, type: 3}
+    - {fileID: 135877124615023086, guid: e221ba1db9080b1479eb4c9229479cdb, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []

@@ -5,15 +5,13 @@ using UnityEngine;
 public class GoonStateSteering<T> : State<T>
 {
     FlockingManager _flockingManager;
-    GoonEnemy _goon;
-    ObstacleAvoidance _obs;
+    GoonEnemyModel _goon;
     Rigidbody _target;
 
-    public GoonStateSteering(GoonEnemy goon, Rigidbody target, FlockingManager flockingManager, ObstacleAvoidance obs)
+    public GoonStateSteering(GoonEnemyModel goon, Rigidbody target, FlockingManager flockingManager)
     {
         _flockingManager = flockingManager;
         _goon = goon;
-        _obs = obs;
         _target = target;
     }
 
@@ -36,9 +34,7 @@ public class GoonStateSteering<T> : State<T>
     {
         var steering = _flockingManager.GetDir();
         steering.y = 0;
-        var dir = _obs.GetDir(steering, false);
-        _goon.Move(dir);
-        _goon.LookDir(dir);
+        _goon.Move(steering);
     }
 
     public override void Exit()

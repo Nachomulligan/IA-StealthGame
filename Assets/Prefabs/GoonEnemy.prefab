@@ -1511,7 +1511,7 @@ GameObject:
   - component: {fileID: 2534989359131209644}
   - component: {fileID: 5747996367981658477}
   - component: {fileID: 1942236589528780379}
-  - component: {fileID: 1958960136314430448}
+  - component: {fileID: 8283597222554472951}
   - component: {fileID: 7968889567079371110}
   - component: {fileID: 5274367762414848808}
   - component: {fileID: 1661547273550792598}
@@ -1607,7 +1607,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   target: {fileID: 0}
---- !u!114 &1958960136314430448
+  zone: {fileID: 0}
+  timePrediction: 0
+--- !u!114 &8283597222554472951
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1619,7 +1621,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 972281e9cc6302a4883aecdaad2308e6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speed: 5
+  speed: 0
   speedRot: 5
 --- !u!114 &7968889567079371110
 MonoBehaviour:
@@ -1670,6 +1672,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   multiplier: 1
+  _flockingType: 0
 --- !u!114 &412065882908349408
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1683,6 +1686,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   multiplier: 1
+  _flockingType: 0
 --- !u!114 &9130894699993314687
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1696,6 +1700,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   multiplier: 1
+  _flockingType: 0
   personalArea: 5
 --- !u!114 &2583720015978397380
 MonoBehaviour:
@@ -1710,6 +1715,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   multiplier: 1
+  _flockingType: 0
   timePrediction: 1
 --- !u!114 &4446859116131143257
 MonoBehaviour:
@@ -1724,6 +1730,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   multiplier: 10
+  _flockingType: 0
   radius: 2
   maxPredators: 5
   predatorMask:

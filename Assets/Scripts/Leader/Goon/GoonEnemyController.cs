@@ -1,29 +1,23 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
-
-public class GoonEnemyController : MonoBehaviour
+public class GoonEnemyController : BaseFlockingEnemyController
 {
-    public Rigidbody target;
-    FSM<StateEnum> _fsm;
-    GoonEnemy _goon;
+    GoonEnemyModel _goon;
 
-    private void Start()
+    protected override BaseFlockingEnemyModel GetEnemyModel()
     {
-        _goon = GetComponent<GoonEnemy>();
-        InitializeFSM();
+        return GetComponent<GoonEnemyModel>();
     }
 
-    void InitializeFSM()
-    {
-        var obs = GetComponent<ObstacleAvoidance>();
-        var flockingManager = GetComponent<FlockingManager>();
+    protected override void InitializedFSM()
 
+    {
+        var flockingManager = GetComponent<FlockingManager>();
+        _goon = GetEnemyModel() as GoonEnemyModel;
         _fsm = new FSM<StateEnum>();
 
         var idle = new GoonStateIdle<StateEnum>();
-        var steering = new GoonStateSteering<StateEnum>(_goon, target, flockingManager, obs);
+        var steering = new GoonStateSteering<StateEnum>(_goon, target, flockingManager);
 
         idle.AddTransition(StateEnum.Walk, steering);
         steering.AddTransition(StateEnum.Idle, idle);
@@ -31,8 +25,9 @@ public class GoonEnemyController : MonoBehaviour
         _fsm.SetInit(steering);
     }
 
-    void Update()
+    protected override void InitializedTree()
     {
-        _fsm.OnExecute();
+        _root = new EmptyNode();
     }
+
 }
