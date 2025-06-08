@@ -6,7 +6,7 @@ public class LeaderEnemyModel : BaseEnemyModel
     [Header("Leader Attack Settings")]
     [SerializeField] private bool useRangedAttack = false;
 
-    [Header("Attack Probabilities")]
+    [Header("Ranged Attack Probability")]
     [Range(0f, 1f)]
     [SerializeField] private float rangedAttackProbability = 0.3f; // Inicialmente 30%
 
@@ -66,9 +66,9 @@ public class LeaderEnemyModel : BaseEnemyModel
     private void DecideAttackType()
     {
         // Obtén el número de kills del player
-        int playerKills = _player.GetKillCount(); // <-- Necesitas que PlayerModel tenga este método
+        int playerKills = _player.GetKillCount();
 
-        // Actualiza la probabilidad según las kills
+        // Actualiza la probabilidad de ranged (y melee implícitamente)
         UpdateAttackProbability(playerKills);
 
         // Ruleta: decide qué ataque usar
@@ -78,19 +78,19 @@ public class LeaderEnemyModel : BaseEnemyModel
 
     private void UpdateAttackProbability(int playerKills)
     {
-        // Ejemplo de ajuste de probabilidades
-        if (playerKills < 5)
-        {
-            rangedAttackProbability = 0.2f; // 20% ranged
-        }
-        else if (playerKills < 10)
-        {
-            rangedAttackProbability = 0.5f; // 50% ranged
-        }
-        else
-        {
-            rangedAttackProbability = 0.8f; // 80% ranged
-        }
+        // Base probability
+        float baseProbability = 0.2f; // 20% inicial ranged
+
+        // Multiplicador: +5% por kill
+        float multiplierPerKill = 0.05f; // +5% por kill
+
+        // Calcula la nueva probabilidad de ranged
+        rangedAttackProbability = baseProbability + (playerKills * multiplierPerKill);
+
+        // Clampea entre 0% y 100%
+        rangedAttackProbability = Mathf.Clamp01(rangedAttackProbability);
+
+        // No necesitas variable extra: meleeProbability = 1 - rangedAttackProbability
     }
 
     public void SetAttackType(bool useRanged)
