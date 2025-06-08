@@ -13,4 +13,4 @@ MonoBehaviour:
   m_Name: Weapon_2
   m_EditorClassIdentifier: 
   weaponName: Weapon_2
-  weaponPrefab: {fileID: 701043382357391564, guid: b5fd7c1dd43ac824d9c0896afaf84142, type: 3}
+  weaponPrefab: {fileID: 738521412382929278, guid: 85734f668aef7db4d95b65a6af237e57, type: 3}
