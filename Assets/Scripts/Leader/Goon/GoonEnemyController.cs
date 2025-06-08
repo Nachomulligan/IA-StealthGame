@@ -40,30 +40,42 @@ public class GoonEnemyController : BaseFlockingEnemyController
     protected override void InitializedTree()
     {
         // Acciones
-        var patrol = new ActionNode(() => _fsm.Transition(StateEnum.Patrol));
-        var evade = new ActionNode(() => _fsm.Transition(StateEnum.Evade));
-        var goZone = new ActionNode(() => _fsm.Transition(StateEnum.GoZone));
+        var patrol = new ActionNode(() => {
+            Debug.Log($"[{Time.time:F2}] → TRANSITION: PATROL");
+            _fsm.Transition(StateEnum.Patrol);
+        });
 
-        // Preguntas
-        var qGoToZone = new QuestionNode(() => QuestionGoToZone(), goZone, patrol);
+        var evade = new ActionNode(() => {
+            Debug.Log($"[{Time.time:F2}] → TRANSITION: EVADE");
+            _fsm.Transition(StateEnum.Evade);
+        });
+
+        var goZone = new ActionNode(() => _fsm.Transition(StateEnum.GoZone));
+        var doNothing = new ActionNode(() => {
+            Debug.Log($"[{Time.time:F2}] → NO TRANSITION (still in EVADE)");
+        });
 
         // Solo verificar si el tiempo de evade terminó cuando estamos evadiendo
-        var qEvadeTimeOver = new QuestionNode(() =>
-    _fsm.CurrState() is GoonStateEvade<StateEnum> && (_evadeState?.IsEvadeTimeOver ?? false),
-    patrol, evade);
+        var qEvadeTimeOver = new QuestionNode(
+            () => _fsm.CurrState() is GoonStateEvade<StateEnum>,
 
+            // Si estamos en evade → ¿terminó el tiempo?
+            new QuestionNode(
+                () => _evadeState?.IsEvadeTimeOver ?? false,
+                patrol,
+                doNothing
+            ),
 
-        var qTargetInView = new QuestionNode(() => QuestionTargetInView(), qEvadeTimeOver, patrol);
+            // Si NO estamos en evade → ¿vemos al jugador?
+            new QuestionNode(
+                () => QuestionTargetInView(),
+                evade,
+                patrol
+            )
+        );
 
-        _root = qTargetInView;
+        _root = qEvadeTimeOver;
     }
-    protected override void Update()
-    {
-        base.Update();
-        // Actualizar el tiempo cuando vemos al player (target heredado)
-        if (QuestionTargetInView())
-        {
-            _lastTimeSawTarget = Time.time;
-        }
-    }
+
+
 }
