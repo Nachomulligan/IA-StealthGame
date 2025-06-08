@@ -1,12 +1,12 @@
 using UnityEngine;
 
-public class Trapp : MonoBehaviour
+public class WeaponTrap : MonoBehaviour
 {
     
     private  int currentTrapCount = 0;
 
     [SerializeField] private int maxTrapCount = 5;
-    private CounterManager _counterManager;
+
     private void Start()
     {
         if (currentTrapCount >= maxTrapCount)
@@ -26,7 +26,7 @@ public class Trapp : MonoBehaviour
             if (damageable != null)
             {
                 EventManager.InvokeNPCDeath(damageable);
-                _counterManager = ServiceLocator.Instance.GetService<CounterManager>();
+                var _counterManager = ServiceLocator.Instance.GetService<CounterManager>();
                 CounterManager.Instance.RegisterKill("Weapon 3");
             }
 

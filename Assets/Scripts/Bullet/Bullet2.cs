@@ -5,7 +5,6 @@ public class Bullet2 : MonoBehaviour
 {
     [SerializeField] private float speed = 10f;
     [SerializeField] private float lifetime = 3f;
-    private CounterManager _counterManager;
     
 
     private float lifeTimer = 0f;
@@ -29,7 +28,7 @@ public class Bullet2 : MonoBehaviour
             if (damageable != null)
             {
                 EventManager.InvokeNPCDeath(damageable);
-                _counterManager = ServiceLocator.Instance.GetService<CounterManager>();
+                var _counterManager = ServiceLocator.Instance.GetService<CounterManager>();
                 CounterManager.Instance.RegisterKill("Weapon 2");
             }
 
