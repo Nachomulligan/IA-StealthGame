@@ -6,7 +6,6 @@ public class GoonEnemyController : BaseFlockingEnemyController
     public float evadeTime = 3f;
     public Rigidbody leaderTarget; // Target para seguir como líder (diferente del player)
     private GoonEnemyModel _goon;
-    private float _lastTimeSawTarget = float.NegativeInfinity;
 
     private GoonStateEvade<StateEnum> _evadeState;
 

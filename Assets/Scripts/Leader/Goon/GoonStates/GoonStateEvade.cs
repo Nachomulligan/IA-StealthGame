@@ -18,7 +18,6 @@ public class GoonStateEvade<T> : State<T>
         _goon = goon;
         _target = target;
         _evadeDuration = evadeDuration;
-        _evade = new Evade(goon.transform, target, 0, 1f);
     }
 
     public override void Enter()
@@ -48,13 +47,11 @@ public class GoonStateEvade<T> : State<T>
             _evadeTimeOver = true;
         }
 
-        var evadeDir = _evade.GetDir();
-        var flockingDir = _flockingManager.GetDir();
-        var steering = (evadeDir * 2f + flockingDir).normalized;
+        var steering = _flockingManager.GetDir();
         steering.y = 0;
-
         _goon.Move(steering);
     }
+
 
     public override void Exit()
     {

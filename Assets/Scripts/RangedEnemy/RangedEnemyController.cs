@@ -89,7 +89,7 @@ public class RangedEnemyController : BaseEnemyController
             (_fsm.CurrState() as NPCSPatrol<StateEnum>)?.IsTired ?? false,
             idle, patrol);
         var qIsRested = new QuestionNode(() =>
-            (_fsm.CurrState() as NPCSIdle<StateEnum>)?.IsRested ?? false,
+            (_fsm.CurrState() as RangedEnemysIdle<StateEnum>)?.IsRested ?? false,
             patrol, idle);
 
         var qCurrentlyPatrolling = new QuestionNode(() => _fsm.CurrState() is NPCSPatrol<StateEnum>, qIsTired, qIsRested);
