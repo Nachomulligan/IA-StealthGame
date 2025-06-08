@@ -12,9 +12,9 @@ GameObject:
   - component: {fileID: 7576522041302337169}
   - component: {fileID: 4438042533891984141}
   - component: {fileID: 8855276374468069873}
-  - component: {fileID: 416336230821085326}
+  - component: {fileID: 8491826866681917616}
   m_Layer: 0
-  m_Name: Bullet
+  m_Name: Bullet 1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -109,7 +109,7 @@ SphereCollider:
   serializedVersion: 3
   m_Radius: 0.5
   m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &416336230821085326
+--- !u!114 &8491826866681917616
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -118,10 +118,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 2039294866332499845}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a751a69548fa28f49ba750c0f3a9759c, type: 3}
+  m_Script: {fileID: 11500000, guid: 149f50cc0c1617748a81f6fe676b37a6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  attackRange: 5.09
-  enemyLayer:
-    serializedVersion: 2
-    m_Bits: 256
+  speed: 10
+  lifetime: 3
+  damage: 1

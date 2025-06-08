@@ -1518,7 +1518,7 @@ GameObject:
   - component: {fileID: -164984246491288812}
   m_Layer: 8
   m_Name: RangedEnemy
-  m_TagString: Untagged
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1654,10 +1654,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   speed: 2
-  playerAttackRange: 5
-  enemyLayer:
-    serializedVersion: 2
-    m_Bits: 64
   attackRange: 11
   pursuitRange: 14
   enemyMask:
@@ -1668,6 +1664,7 @@ MonoBehaviour:
   bulletSpeed: 10
   bulletLifetime: 3
   bulletDamage: 10
+  _player: {fileID: 0}
 --- !u!114 &-4913178025557301191
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1686,8 +1683,6 @@ MonoBehaviour:
   patrolWaypoints:
   - {fileID: 0}
   - {fileID: 0}
-  _restTimeOut: 0
-  _patrolTimeOut: 0
   restTime: 5
   waitTime: 5
 --- !u!114 &-164984246491288812

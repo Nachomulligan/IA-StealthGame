@@ -48,6 +48,7 @@ public class Bullet : MonoBehaviour
                 playerController.KillPlayer();
                 Destroy(gameObject);
             }
-        }
+        }                                                         
     }
 }
+   

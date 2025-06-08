@@ -14,7 +14,7 @@ public class PlayerModel : BaseEntityModel
 
     [Header("Weapon System")]
     [SerializeField] private Transform weaponPoint;
-    [SerializeField] private GameObject currentWeapon;
+    public GameObject currentWeapon;
 
     private bool _isArmed = false;
     private bool _canAttack = false;

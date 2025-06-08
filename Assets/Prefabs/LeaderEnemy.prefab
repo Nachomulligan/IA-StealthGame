@@ -1517,7 +1517,7 @@ GameObject:
   - component: {fileID: 8556801256605850211}
   m_Layer: 8
   m_Name: LeaderEnemy
-  m_TagString: Untagged
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1653,13 +1653,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   speed: 3
-  playerAttackRange: 5
-  enemyLayer:
-    serializedVersion: 2
-    m_Bits: 64
-  PlayerTransform: {fileID: 0}
-  weaponPoint: {fileID: 0}
-  currentWeapon: {fileID: 0}
   attackRange: 5
   pursuitRange: 10
   enemyMask:
@@ -1687,6 +1680,8 @@ MonoBehaviour:
   zone: {fileID: 0}
   timePrediction: 0
   patrolWaypoints: []
+  restTime: 5
+  waitTime: 5
 --- !u!1 &3228715066654085674
 GameObject:
   m_ObjectHideFlags: 0

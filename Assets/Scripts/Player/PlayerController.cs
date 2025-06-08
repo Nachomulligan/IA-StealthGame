@@ -89,11 +89,21 @@ public class PlayerController : MonoBehaviour
     {
         if (_playerModel.IsArmed && _playerModel.CanAttack)
         {
-            _fsm.Transition(StateEnum.Attack);
+          
+            GunWeapon gun = _playerModel.currentWeapon?.GetComponent<GunWeapon>();
+            if (gun != null)
+            {
+                gun.Fire();
+            }
+            else
+            {
+                _fsm.Transition(StateEnum.Attack);
+                _playerModel.Attack();
+            }
         }
         else
         {
-            Debug.Log("Doesn't have an attack, can't attack");
+            Debug.Log("No puedes atacar, no tienes un arma.");
         }
     }
     private void HandleInteractionInput()
@@ -120,7 +130,6 @@ public class PlayerController : MonoBehaviour
             Debug.Log($"Picked up weapon: {weaponData.weaponName}");
         }
     }
-
     public void EquipWeaponFromInventory(int index)
     {
         if (_weaponInventory != null)
