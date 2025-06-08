@@ -5,8 +5,8 @@ public class Trapp : MonoBehaviour
     
     private  int currentTrapCount = 0;
 
-    [SerializeField] private int maxTrapCount = 5; 
-
+    [SerializeField] private int maxTrapCount = 5;
+    private CounterManager _counterManager;
     private void Start()
     {
         if (currentTrapCount >= maxTrapCount)
@@ -18,7 +18,6 @@ public class Trapp : MonoBehaviour
         // Sumar esta trampa
         currentTrapCount++;
     }
-
     private void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("Enemy"))
@@ -27,12 +26,13 @@ public class Trapp : MonoBehaviour
             if (damageable != null)
             {
                 EventManager.InvokeNPCDeath(damageable);
+                _counterManager = ServiceLocator.Instance.GetService<CounterManager>();
+                CounterManager.Instance.RegisterKill("Weapon 3");
             }
 
             Destroy(gameObject);
         }
     }
-
     private void OnDestroy()
     {
         if (currentTrapCount > 0)
