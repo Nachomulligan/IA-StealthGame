@@ -1519,6 +1519,7 @@ GameObject:
   - component: {fileID: 9130894699993314687}
   - component: {fileID: 2583720015978397380}
   - component: {fileID: 4446859116131143257}
+  - component: {fileID: 5129872016635192343}
   m_Layer: 8
   m_Name: GoonEnemy
   m_TagString: Untagged
@@ -1609,6 +1610,9 @@ MonoBehaviour:
   target: {fileID: 0}
   zone: {fileID: 0}
   timePrediction: 0
+  evadeTime: 3
+  zoneArrivalThreshold: 2
+  leaderTarget: {fileID: 0}
 --- !u!114 &8283597222554472951
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1736,6 +1740,21 @@ MonoBehaviour:
   predatorMask:
     serializedVersion: 2
     m_Bits: 64
+--- !u!114 &5129872016635192343
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3169414732572980433}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6da6f7dc33ac29f4c8cb0129ccc70569, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  multiplier: 1
+  _flockingType: 5
+  target: {fileID: 0}
 --- !u!1 &3228715066654085674
 GameObject:
   m_ObjectHideFlags: 0

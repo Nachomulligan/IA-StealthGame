@@ -4,5 +4,6 @@ public enum FlockingType
     Avoidance,
     Leader,
     Cohesion,
-    Alignment
+    Alignment,
+    Seek
 }

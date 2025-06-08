@@ -7,7 +7,6 @@ public class GoonStateEvade<T> : State<T>
     private Rigidbody _target;
     private Evade _evade;
 
-    // Timer interno para el evade
     private float _evadeTimer;
     private float _evadeDuration;
     private bool _evadeTimeOver;
@@ -25,7 +24,6 @@ public class GoonStateEvade<T> : State<T>
         Debug.Log("evade");
         base.Enter();
 
-        // Resetear timer al entrar
         _evadeTimer = 0f;
         _evadeTimeOver = false;
 
@@ -40,7 +38,6 @@ public class GoonStateEvade<T> : State<T>
 
     public override void Execute()
     {
-        // Actualizar timer
         _evadeTimer += Time.deltaTime;
         if (_evadeTimer >= _evadeDuration)
         {
@@ -57,12 +54,10 @@ public class GoonStateEvade<T> : State<T>
     {
         base.Exit();
 
-        // Resetear timer al salir
         _evadeTimer = 0f;
         _evadeTimeOver = false;
 
     }
 
-    // Getter para que el FSM pueda verificar si el tiempo de evade terminó
     public bool IsEvadeTimeOver => _evadeTimeOver;
 }

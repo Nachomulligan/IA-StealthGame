@@ -4,17 +4,19 @@ public class GoonEnemyController : BaseFlockingEnemyController
 {
     [Header("Goon Settings")]
     public float evadeTime = 3f;
-    public Rigidbody leaderTarget; // Target para seguir como líder (diferente del player)
-    private GoonEnemyModel _goon;
+    public float zoneArrivalThreshold = 2f;
+    public Rigidbody leaderTarget;
 
+    private GoonEnemyModel _goon;
     private GoonStateEvade<StateEnum> _evadeState;
+    private GoonStateGoZone<StateEnum> _goZoneState;
+    private GoonStateIdle<StateEnum> _idleState;
 
     protected override BaseFlockingEnemyModel GetEnemyModel()
     {
         return GetComponent<GoonEnemyModel>();
     }
 
-    // Método para verificar si el líder sigue siendo válido
     public bool IsLeaderValid()
     {
         return leaderTarget != null && leaderTarget.gameObject != null;
@@ -26,60 +28,67 @@ public class GoonEnemyController : BaseFlockingEnemyController
         _goon = GetEnemyModel() as GoonEnemyModel;
         _fsm = new FSM<StateEnum>();
 
-        // Crear los estados
         var patrol = new GoonStatePatrol<StateEnum>(_goon, leaderTarget, flockingManager);
         _evadeState = new GoonStateEvade<StateEnum>(_goon, target, flockingManager, evadeTime);
-        var goZone = new GoonStateGoZone<StateEnum>(_goon, zone, flockingManager);
+        _goZoneState = new GoonStateGoZone<StateEnum>(_goon, zone, flockingManager, zoneArrivalThreshold);
+        _idleState = new GoonStateIdle<StateEnum>(_goon, flockingManager);
 
-        // Configurar transiciones
         patrol.AddTransition(StateEnum.Evade, _evadeState);
-        patrol.AddTransition(StateEnum.GoZone, goZone);
-        _evadeState.AddTransition(StateEnum.GoZone, goZone);
+        patrol.AddTransition(StateEnum.GoZone, _goZoneState);
+
+        _evadeState.AddTransition(StateEnum.GoZone, _goZoneState);
         _evadeState.AddTransition(StateEnum.Patrol, patrol);
-        goZone.AddTransition(StateEnum.Patrol, patrol);
-        goZone.AddTransition(StateEnum.Evade, _evadeState);
+        _evadeState.AddTransition(StateEnum.Idle, _idleState);
+
+        _goZoneState.AddTransition(StateEnum.Patrol, patrol);
+        _goZoneState.AddTransition(StateEnum.Evade, _evadeState);
+        _goZoneState.AddTransition(StateEnum.Idle, _idleState);
+
+        _idleState.AddTransition(StateEnum.Evade, _evadeState);
+        _idleState.AddTransition(StateEnum.GoZone, _goZoneState);
+        _idleState.AddTransition(StateEnum.Patrol, patrol);
 
         _fsm.SetInit(patrol);
     }
 
     protected override void InitializedTree()
     {
-        // Acciones
-        var patrol = new ActionNode(() => {
-            Debug.Log($"[{Time.time:F2}] → TRANSITION: PATROL");
+        var patrol = new ActionNode(() =>
+        {
+           // Debug.Log($"[{Time.time:F2}] → TRANSITION: PATROL");
             _fsm.Transition(StateEnum.Patrol);
         });
 
-        var evade = new ActionNode(() => {
-            Debug.Log($"[{Time.time:F2}] → TRANSITION: EVADE");
+        var evade = new ActionNode(() =>
+        {
+          //  Debug.Log($"[{Time.time:F2}] → TRANSITION: EVADE");
             _fsm.Transition(StateEnum.Evade);
         });
 
-        var goZone = new ActionNode(() => {
-            Debug.Log($"[{Time.time:F2}] → TRANSITION: GO ZONE");
+        var goZone = new ActionNode(() =>
+        {
+         //   Debug.Log($"[{Time.time:F2}] → TRANSITION: GO ZONE");
             _fsm.Transition(StateEnum.GoZone);
         });
 
-        var doNothing = new ActionNode(() => {
-            Debug.Log($"[{Time.time:F2}] → NO TRANSITION (still in EVADE)");
+        var idle = new ActionNode(() =>
+        {
+          //  Debug.Log($"[{Time.time:F2}] → TRANSITION: IDLE");
+            _fsm.Transition(StateEnum.Idle);
         });
 
-        // Pregunta si el líder es válido (existe y no fue destruido)
+
         var qLeaderExists = new QuestionNode(
             () => IsLeaderValid(),
 
-            // SI el líder existe → comportamiento normal
+            // leader logic
             new QuestionNode(
                 () => _fsm.CurrState() is GoonStateEvade<StateEnum>,
-
-                // Si estamos en evade → ¿terminó el tiempo?
                 new QuestionNode(
                     () => _evadeState?.IsEvadeTimeOver ?? false,
                     patrol,
-                    doNothing
+                    evade
                 ),
-
-                // Si NO estamos en evade → ¿vemos al jugador?
                 new QuestionNode(
                     () => QuestionTargetInView(),
                     evade,
@@ -87,21 +96,46 @@ public class GoonEnemyController : BaseFlockingEnemyController
                 )
             ),
 
-            // SI el líder es null → ir a zona
+            // leaderless logic
             new QuestionNode(
-                () => QuestionGoToZone(),
-                goZone,
-                patrol // Si ya llegó a la zona, puede patrullar sin líder
+                () => _fsm.CurrState() is GoonStateEvade<StateEnum>,
+                new QuestionNode(
+                    () => _evadeState?.IsEvadeTimeOver ?? false,
+                    new QuestionNode(
+                        () => Vector3.Distance(_goon.transform.position, zone.position) <= zoneArrivalThreshold,
+                        idle,
+                        goZone
+                    ),
+                    evade
+                ),
+
+                new QuestionNode(
+                    () => _fsm.CurrState() is GoonStateIdle<StateEnum>,
+                    new QuestionNode(
+                        () => QuestionTargetInView(),
+                        evade,
+                        idle
+                    ),
+
+                    new QuestionNode(
+                        () => _fsm.CurrState() is GoonStateGoZone<StateEnum>,
+                        new QuestionNode(
+                            () => QuestionTargetInView(),
+                            evade,
+                            new QuestionNode(
+                                () => _goZoneState.HasArrivedAtZone,
+                                idle,
+                                goZone
+                            )
+                        ),
+                        goZone
+                    )
+                )
             )
         );
 
         _root = qLeaderExists;
     }
-
-    // Método adicional para verificar si debe ir a zona cuando no hay líder
-    protected bool QuestionShouldGoToZoneWithoutLeader()
-    {
-        // Cuando no hay líder, siempre debe ir a zona si no está cerca
-        return QuestionGoToZone();
-    }
 }
+
+
