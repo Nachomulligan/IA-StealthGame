@@ -28,12 +28,8 @@ public class GoonStateGoZone<T> : State<T>
     public override void Execute()
     {
         var seekDir = _seek.GetDir();
-        var flockingDir = _flockingManager.GetDir();
 
-        var steering = (seekDir * 2f + flockingDir).normalized;
-        steering.y = 0;
-
-        _goon.Move(steering);
+        _goon.Move(seekDir);
     }
 
     public override void Exit()

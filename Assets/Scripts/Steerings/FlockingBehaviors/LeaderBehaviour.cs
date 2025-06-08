@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 public class LeaderBehaviour : FlockingBaseBehaviour
@@ -12,32 +12,45 @@ public class LeaderBehaviour : FlockingBaseBehaviour
     {
         _pursuit = new Pursuit(transform, 0, timePrediction);
         _seek = new Seek(transform);
-        if (_flockingType != FlockingType.Leader)
-            _flockingType = FlockingType.Leader;
+        if (_flockingType != FlockingType.Leader) _flockingType = FlockingType.Leader;
     }
 
     protected override Vector3 GetRealDir(List<IBoid> boids, IBoid self)
     {
+        // Ahora Pursuit y Seek manejan internamente las referencias null
         if (_isPursuit)
         {
             return _pursuit.GetDir() * multiplier;
         }
-        return _seek.GetDir() * multiplier;
+        else
+        {
+            return _seek.GetDir() * multiplier;
+        }
     }
 
     public Transform Leader
     {
         set
         {
-            var rb = value.GetComponent<Rigidbody>();
-            if (rb)
+            if (value != null && value.gameObject != null)
             {
-                _pursuit.Target = rb;
-                _isPursuit = true;
+                var rb = value.GetComponent<Rigidbody>();
+                if (rb)
+                {
+                    _pursuit.Target = rb;
+                    _isPursuit = true;
+                }
+                else
+                {
+                    _seek.Target = value;
+                    _isPursuit = false;
+                }
             }
             else
             {
-                _seek.Target = value;
+                // Si se asigna null, limpiar referencias
+                _pursuit.Target = null;
+                _seek.Target = null;
                 _isPursuit = false;
             }
         }
@@ -47,8 +60,17 @@ public class LeaderBehaviour : FlockingBaseBehaviour
     {
         set
         {
-            _pursuit.Target = value;
-            _isPursuit = true;
+            if (value != null && value.gameObject != null)
+            {
+                _pursuit.Target = value;
+                _isPursuit = true;
+            }
+            else
+            {
+                // Si se asigna null, limpiar referencia
+                _pursuit.Target = null;
+                _isPursuit = false;
+            }
         }
     }
 }

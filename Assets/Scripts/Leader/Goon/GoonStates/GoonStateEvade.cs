@@ -61,10 +61,6 @@ public class GoonStateEvade<T> : State<T>
         _evadeTimer = 0f;
         _evadeTimeOver = false;
 
-        _flockingManager.SetFlockingActive(FlockingType.Predator, false);
-
-        _flockingManager.SetFlockingMultiplier(FlockingType.Predator, 1f);
-        _flockingManager.SetFlockingMultiplier(FlockingType.Avoidance, 1f);
     }
 
     // Getter para que el FSM pueda verificar si el tiempo de evade terminó

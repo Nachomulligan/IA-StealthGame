@@ -14,6 +14,12 @@ public class GoonEnemyController : BaseFlockingEnemyController
         return GetComponent<GoonEnemyModel>();
     }
 
+    // Método para verificar si el líder sigue siendo válido
+    public bool IsLeaderValid()
+    {
+        return leaderTarget != null && leaderTarget.gameObject != null;
+    }
+
     protected override void InitializedFSM()
     {
         var flockingManager = GetComponent<FlockingManager>();
@@ -22,7 +28,7 @@ public class GoonEnemyController : BaseFlockingEnemyController
 
         // Crear los estados
         var patrol = new GoonStatePatrol<StateEnum>(_goon, leaderTarget, flockingManager);
-        _evadeState = new GoonStateEvade<StateEnum>(_goon, target, flockingManager, evadeTime); // Pasamos evadeTime aquí
+        _evadeState = new GoonStateEvade<StateEnum>(_goon, target, flockingManager, evadeTime);
         var goZone = new GoonStateGoZone<StateEnum>(_goon, zone, flockingManager);
 
         // Configurar transiciones
@@ -49,32 +55,53 @@ public class GoonEnemyController : BaseFlockingEnemyController
             _fsm.Transition(StateEnum.Evade);
         });
 
-        var goZone = new ActionNode(() => _fsm.Transition(StateEnum.GoZone));
+        var goZone = new ActionNode(() => {
+            Debug.Log($"[{Time.time:F2}] → TRANSITION: GO ZONE");
+            _fsm.Transition(StateEnum.GoZone);
+        });
+
         var doNothing = new ActionNode(() => {
             Debug.Log($"[{Time.time:F2}] → NO TRANSITION (still in EVADE)");
         });
 
-        // Solo verificar si el tiempo de evade terminó cuando estamos evadiendo
-        var qEvadeTimeOver = new QuestionNode(
-            () => _fsm.CurrState() is GoonStateEvade<StateEnum>,
+        // Pregunta si el líder es válido (existe y no fue destruido)
+        var qLeaderExists = new QuestionNode(
+            () => IsLeaderValid(),
 
-            // Si estamos en evade → ¿terminó el tiempo?
+            // SI el líder existe → comportamiento normal
             new QuestionNode(
-                () => _evadeState?.IsEvadeTimeOver ?? false,
-                patrol,
-                doNothing
+                () => _fsm.CurrState() is GoonStateEvade<StateEnum>,
+
+                // Si estamos en evade → ¿terminó el tiempo?
+                new QuestionNode(
+                    () => _evadeState?.IsEvadeTimeOver ?? false,
+                    patrol,
+                    doNothing
+                ),
+
+                // Si NO estamos en evade → ¿vemos al jugador?
+                new QuestionNode(
+                    () => QuestionTargetInView(),
+                    evade,
+                    patrol
+                )
             ),
 
-            // Si NO estamos en evade → ¿vemos al jugador?
+            // SI el líder es null → ir a zona
             new QuestionNode(
-                () => QuestionTargetInView(),
-                evade,
-                patrol
+                () => QuestionGoToZone(),
+                goZone,
+                patrol // Si ya llegó a la zona, puede patrullar sin líder
             )
         );
 
-        _root = qEvadeTimeOver;
+        _root = qLeaderExists;
     }
 
-
+    // Método adicional para verificar si debe ir a zona cuando no hay líder
+    protected bool QuestionShouldGoToZoneWithoutLeader()
+    {
+        // Cuando no hay líder, siempre debe ir a zona si no está cerca
+        return QuestionGoToZone();
+    }
 }
