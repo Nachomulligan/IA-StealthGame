@@ -148,8 +148,30 @@ public class LeaderEnemyModel : BaseEnemyModel
 
     private void ExecuteExplosionAttack()
     {
+        StartCoroutine(ExplosionAttackCoroutine());
+    }
+
+    private System.Collections.IEnumerator ExplosionAttackCoroutine()
+    {
         Debug.Log("Leader Enemy: Ejecutando ataque EXPLOSION");
 
+        if (explosionEffectPrefab != null)
+        {
+            Instantiate(explosionEffectPrefab, transform.position, Quaternion.identity);
+        }
+
+        yield return new WaitForSeconds(1f);
+
+        var colls = Physics.OverlapSphere(transform.position, explosionRadius, enemyMask);
+        for (int i = 0; i < colls.Length; i++)
+        {
+            PlayerController playerController = colls[i].GetComponent<PlayerController>();
+            if (playerController != null)
+            {
+                playerController.KillPlayer();
+                Debug.Log("Leader Enemy: Jugador eliminado por explosión después del delay");
+            }
+        }
     }
 
     private void LogRouletteInfo(Dictionary<AttackType, float> weights, AttackType selected)
