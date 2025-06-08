@@ -6,6 +6,10 @@ public class LeaderEnemyModel : BaseEnemyModel
     [Header("Leader Attack Settings")]
     [SerializeField] private bool useRangedAttack = false;
 
+    [Header("Attack Probabilities")]
+    [Range(0f, 1f)]
+    [SerializeField] private float rangedAttackProbability = 0.3f; // Inicialmente 30%
+
     [Header("Ranged Attack")]
     [SerializeField] private GameObject bulletPrefab;
     [SerializeField] private Transform firePoint;
@@ -19,12 +23,16 @@ public class LeaderEnemyModel : BaseEnemyModel
     {
         base.Awake();
     }
+
     public void Start()
     {
         _player = ServiceLocator.Instance.GetService<PlayerModel>();
     }
+
     public override void Attack()
     {
+        DecideAttackType();
+
         if (useRangedAttack)
         {
             // Ataque a distancia
@@ -54,9 +62,41 @@ public class LeaderEnemyModel : BaseEnemyModel
             }
         }
     }
+
+    private void DecideAttackType()
+    {
+        // Obtén el número de kills del player
+        int playerKills = _player.GetKillCount(); // <-- Necesitas que PlayerModel tenga este método
+
+        // Actualiza la probabilidad según las kills
+        UpdateAttackProbability(playerKills);
+
+        // Ruleta: decide qué ataque usar
+        float roll = Random.Range(0f, 1f);
+        useRangedAttack = roll < rangedAttackProbability;
+    }
+
+    private void UpdateAttackProbability(int playerKills)
+    {
+        // Ejemplo de ajuste de probabilidades
+        if (playerKills < 5)
+        {
+            rangedAttackProbability = 0.2f; // 20% ranged
+        }
+        else if (playerKills < 10)
+        {
+            rangedAttackProbability = 0.5f; // 50% ranged
+        }
+        else
+        {
+            rangedAttackProbability = 0.8f; // 80% ranged
+        }
+    }
+
     public void SetAttackType(bool useRanged)
     {
         useRangedAttack = useRanged;
     }
+
     public bool IsUsingRangedAttack => useRangedAttack;
 }

@@ -90,4 +90,14 @@ public class PlayerModel : BaseEntityModel
 
         _onAttack();
     }
+
+    public int GetKillCount()
+    {
+        if (_counterManager == null)
+        {
+            _counterManager = ServiceLocator.Instance.GetService<CounterManager>();
+        }
+
+        return _counterManager != null ? _counterManager.GetTotalKills() : 0;
+    }
 }

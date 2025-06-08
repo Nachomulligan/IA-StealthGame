@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class CounterManager : MonoBehaviour
@@ -28,6 +29,10 @@ public class CounterManager : MonoBehaviour
 
         weaponKillCount[weaponName]++;
         Debug.Log($"Kill With Weapon: {weaponName}. Total: {weaponKillCount[weaponName]}");
+    }
+    public int GetTotalKills()
+    {
+        return weaponKillCount.Values.Sum();
     }
 
     public int GetKillsForWeapon(string weaponName)
