@@ -50,7 +50,7 @@ public class GoonEnemyController : BaseFlockingEnemyController
         // Solo verificar si el tiempo de evade terminó cuando estamos evadiendo
         var qEvadeTimeOver = new QuestionNode(() =>
             _fsm.CurrState() is GoonStateEvade<StateEnum> && (_evadeState?.IsEvadeTimeOver ?? false),
-            qGoToZone, evade);
+            patrol, evade);
 
         var qTargetInView = new QuestionNode(() => QuestionTargetInView(), qEvadeTimeOver, patrol);
 

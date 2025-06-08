@@ -33,7 +33,7 @@ public class GoonStatePatrol<T> : State<T>
         }
 
         // Multiplicadores normales para patrullar
-        _flockingManager.SetFlockingMultiplier(FlockingType.Leader, 1.5f);
+        _flockingManager.SetFlockingMultiplier(FlockingType.Leader, 15f);
         _flockingManager.SetFlockingMultiplier(FlockingType.Cohesion, 1f);
         _flockingManager.SetFlockingMultiplier(FlockingType.Alignment, 1f);
         _flockingManager.SetFlockingMultiplier(FlockingType.Avoidance, 1f);
