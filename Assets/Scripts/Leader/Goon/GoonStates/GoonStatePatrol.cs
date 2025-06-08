@@ -17,6 +17,8 @@ public class GoonStatePatrol<T> : State<T>
 
     public override void Enter()
     {
+
+        Debug.Log("patrol");
         base.Enter();
 
         // Activar comportamientos de flocking para patrullar

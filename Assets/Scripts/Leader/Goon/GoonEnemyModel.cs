@@ -18,4 +18,5 @@ public class GoonEnemyModel : BaseFlockingEnemyModel, IBoid, ILook
         Debug.Log("Goon attacking!");
         _onAttack?.Invoke();
     }
+
 }
