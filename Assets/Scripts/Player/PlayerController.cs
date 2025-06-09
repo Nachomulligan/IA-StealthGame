@@ -98,7 +98,6 @@ public class PlayerController : MonoBehaviour
             else
             {
                 _fsm.Transition(StateEnum.Attack);
-                _playerModel.Attack();
             }
         }
         else
