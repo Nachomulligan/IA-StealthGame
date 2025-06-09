@@ -6,13 +6,11 @@ public class Bullet : MonoBehaviour
     private float speed;
     private float lifetime;
     private float lifeTimer;
-    private int damage;
-    public void Initialize(Transform targetTransform, float bulletSpeed, float bulletLifetime, int bulletDamage)
+    public void Initialize(Transform targetTransform, float bulletSpeed, float bulletLifetime)
     {
         target = targetTransform;
         speed = bulletSpeed;
         lifetime = bulletLifetime;
-        damage = bulletDamage;
         lifeTimer = 0f;
     }
     private void Update()

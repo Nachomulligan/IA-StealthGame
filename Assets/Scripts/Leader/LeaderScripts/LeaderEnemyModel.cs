@@ -15,7 +15,6 @@ public class LeaderEnemyModel : BaseEnemyModel
     [SerializeField] private Transform firePoint;
     [SerializeField] private float bulletSpeed = 10f;
     [SerializeField] private float bulletLifetime = 3f;
-    [SerializeField] private int bulletDamage = 10;
 
     [Header("Explosion Attack")]
     [SerializeField] private GameObject explosionEffectPrefab;
@@ -121,7 +120,7 @@ public class LeaderEnemyModel : BaseEnemyModel
 
             if (bullet != null)
             {
-                bullet.Initialize(_player._playerTransform, bulletSpeed, bulletLifetime, bulletDamage);
+                bullet.Initialize(_player._playerTransform, bulletSpeed, bulletLifetime);
             }
         }
     }
@@ -165,7 +164,9 @@ public class LeaderEnemyModel : BaseEnemyModel
             float percentage = (kvp.Value / totalWeight) * 100f;
             string weaponName = GetWeaponNameForAttackType(kvp.Key);
             int kills = _counterManager.GetKillsForWeapon(weaponName);
+            Debug.Log($"{kvp.Key}: {percentage:F1}% (Peso: {kvp.Value:F1}, Kills de {weaponName}: {kills})");
         }
+        Debug.Log($"SELECCIONADO: {selected}");
     }
 
     private string GetWeaponNameForAttackType(AttackType attackType)
@@ -176,28 +177,5 @@ public class LeaderEnemyModel : BaseEnemyModel
                 return kvp.Key;
         }
         return "Weapon Unknown";
-    }
-    public void SetRouletteSettings(float newBaseWeight, float newKillMultiplier, float newMaxBonus)
-    {
-        baseWeight = newBaseWeight;
-        killMultiplier = newKillMultiplier;
-        maxWeightBonus = newMaxBonus;
-    }
-    public Dictionary<AttackType, float> GetCurrentAttackProbabilities()
-    {
-        Dictionary<AttackType, float> weights = CalculateAttackWeights();
-        Dictionary<AttackType, float> probabilities = new Dictionary<AttackType, float>();
-
-        float totalWeight = 0f;
-        foreach (var weight in weights.Values)
-        {
-            totalWeight += weight;
-        }
-
-        foreach (var kvp in weights)
-        {
-            probabilities[kvp.Key] = (kvp.Value / totalWeight) * 100f;
-        }
-        return probabilities;
     }
 }

@@ -39,7 +39,7 @@ public class GoonStatePatrol<T> : State<T>
 
         _flockingManager.SetFlockingMultiplier(FlockingType.Cohesion, 1f);
         _flockingManager.SetFlockingMultiplier(FlockingType.Alignment, 1f);
-        _flockingManager.SetFlockingMultiplier(FlockingType.Avoidance, 1f);
+        _flockingManager.SetFlockingMultiplier(FlockingType.Avoidance, 3f);
     }
 
     public override void Execute()

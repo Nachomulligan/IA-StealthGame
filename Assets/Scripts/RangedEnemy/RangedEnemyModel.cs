@@ -7,8 +7,6 @@ public class RangedEnemyModel : BaseEnemyModel
     [SerializeField] private Transform firePoint;
     [SerializeField] private float bulletSpeed = 10f;
     [SerializeField] private float bulletLifetime = 3f;
-    [SerializeField] private int bulletDamage = 10;
-
     [SerializeField] private PlayerModel _player;
     public void Start()
     {
@@ -24,7 +22,7 @@ public class RangedEnemyModel : BaseEnemyModel
 
             if (bullet != null)
             {
-                bullet.Initialize(_player._playerTransform, bulletSpeed, bulletLifetime, bulletDamage);
+                bullet.Initialize(_player._playerTransform, bulletSpeed, bulletLifetime);
             }
         }
     }
