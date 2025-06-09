@@ -5,39 +5,21 @@ public class ObstacleManager : MonoBehaviour
 {
     Dictionary<Vector3, int> _obs = new Dictionary<Vector3, int>();
     static ObstacleManager instance;
+
     public bool skipY = true;
-    private static bool isQuitting = false; 
 
-    public static ObstacleManager Instance
-    {
-        get
-        {
-            if (isQuitting) return null;
-
-            if (instance == null)
-            {
-                instance = new GameObject("ObstacleManager").AddComponent<ObstacleManager>();
-                DontDestroyOnLoad(instance.gameObject); 
-            }
-            return instance;
-        }
-    }
+    public static ObstacleManager Instance => instance;
 
     private void Awake()
     {
         if (instance != null && instance != this)
         {
-            Destroy(this.gameObject); // Destruir el GameObject completo
+            Destroy(this.gameObject);
         }
         else
         {
             instance = this;
         }
-    }
-
-    private void OnApplicationQuit()
-    {
-        isQuitting = true;
     }
 
     private void OnDestroy()
@@ -54,13 +36,9 @@ public class ObstacleManager : MonoBehaviour
         for (int i = 0; i < points.Count; i++)
         {
             if (_obs.ContainsKey(points[i]))
-            {
                 _obs[points[i]]++;
-            }
             else
-            {
                 _obs[points[i]] = 1;
-            }
         }
     }
 
@@ -71,11 +49,9 @@ public class ObstacleManager : MonoBehaviour
         {
             if (_obs.ContainsKey(points[i]))
             {
-                _obs[points[i]] -= 1;
+                _obs[points[i]]--;
                 if (_obs[points[i]] <= 0)
-                {
                     _obs.Remove(points[i]);
-                }
             }
         }
     }
@@ -83,10 +59,7 @@ public class ObstacleManager : MonoBehaviour
     public bool IsRightPos(Vector3 curr)
     {
         curr = Vector3Int.RoundToInt(curr);
-        if (skipY)
-        {
-            curr.y = 0;
-        }
+        if (skipY) curr.y = 0;
         return !_obs.ContainsKey(curr);
     }
 
@@ -109,9 +82,7 @@ public class ObstacleManager : MonoBehaviour
                 {
                     Vector3 point = new Vector3(x, y, z);
                     if (bounds.Contains(point))
-                    {
                         points.Add(point);
-                    }
                 }
             }
         }
