@@ -1517,7 +1517,7 @@ GameObject:
   - component: {fileID: 8556801256605850211}
   m_Layer: 8
   m_Name: LeaderEnemy
-  m_TagString: Untagged
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1530,7 +1530,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3169414732572980433}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -1, z: -0, w: 0.000000104308114}
+  m_LocalRotation: {x: -0, y: -1, z: 0, w: -0.0000001872535}
   m_LocalPosition: {x: -52.7, y: 1.92, z: 72.52}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -1653,24 +1653,22 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   speed: 3
-  playerAttackRange: 5
-  enemyLayer:
-    serializedVersion: 2
-    m_Bits: 64
-  PlayerTransform: {fileID: 0}
-  weaponPoint: {fileID: 0}
-  currentWeapon: {fileID: 0}
-  attackRange: 5
+  attackRange: 7.62
   pursuitRange: 10
   enemyMask:
     serializedVersion: 2
     m_Bits: 64
-  useRangedAttack: 0
   bulletPrefab: {fileID: 2039294866332499845, guid: d8ab5d266030b5f4dacb055320a60518, type: 3}
   firePoint: {fileID: 5078587299401836344}
   bulletSpeed: 10
   bulletLifetime: 3
   bulletDamage: 10
+  explosionEffectPrefab: {fileID: 1000011797152326, guid: acf39d9f4addf294d93fa56fa373961b, type: 3}
+  explosionRadius: 8
+  explosionDamage: 25
+  baseWeight: 1
+  killMultiplier: 0.3
+  maxWeightBonus: 5
 --- !u!114 &8556801256605850211
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1685,8 +1683,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   target: {fileID: 0}
   zone: {fileID: 0}
-  timePrediction: 0
-  patrolWaypoints: []
+  timePrediction: 1
+  patrolWaypoints:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  restTime: 5
+  waitTime: 5
 --- !u!1 &3228715066654085674
 GameObject:
   m_ObjectHideFlags: 0

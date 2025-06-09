@@ -1520,9 +1520,10 @@ GameObject:
   - component: {fileID: 2583720015978397380}
   - component: {fileID: 4446859116131143257}
   - component: {fileID: 5129872016635192343}
+  - component: {fileID: 6187371464346342323}
   m_Layer: 8
   m_Name: GoonEnemy
-  m_TagString: Untagged
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1535,7 +1536,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3169414732572980433}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -1, z: -0, w: 0.000000104308114}
+  m_LocalRotation: {x: -0, y: -1, z: 0, w: -0.0000001872535}
   m_LocalPosition: {x: -52.7, y: 1.08, z: 72.52}
   m_LocalScale: {x: 0.62877, y: 0.62877, z: 0.62877}
   m_ConstrainProportionsScale: 0
@@ -1609,8 +1610,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   target: {fileID: 0}
   zone: {fileID: 0}
-  timePrediction: 0
-  evadeTime: 3
+  timePrediction: 1
+  evadeTime: 10
   zoneArrivalThreshold: 2
   leaderTarget: {fileID: 0}
 --- !u!114 &8283597222554472951
@@ -1625,7 +1626,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 972281e9cc6302a4883aecdaad2308e6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speed: 0
+  speed: 2
   speedRot: 5
 --- !u!114 &7968889567079371110
 MonoBehaviour:
@@ -1640,7 +1641,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxObs: 2
-  radius: 6
+  radius: 6.35
   angle: 215
   personalArea: 1
   obsMask:
@@ -1676,7 +1677,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   multiplier: 1
-  _flockingType: 0
+  _flockingType: 4
 --- !u!114 &412065882908349408
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1690,7 +1691,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   multiplier: 1
-  _flockingType: 0
+  _flockingType: 3
 --- !u!114 &9130894699993314687
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1703,9 +1704,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f212b608ae9d78242bfb4cdda93b1637, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  multiplier: 1
-  _flockingType: 0
-  personalArea: 5
+  multiplier: 2
+  _flockingType: 1
+  personalArea: 4
 --- !u!114 &2583720015978397380
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1719,7 +1720,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   multiplier: 1
-  _flockingType: 0
+  _flockingType: 2
   timePrediction: 1
 --- !u!114 &4446859116131143257
 MonoBehaviour:
@@ -1735,7 +1736,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   multiplier: 10
   _flockingType: 0
-  radius: 2
+  radius: 15.18
   maxPredators: 5
   predatorMask:
     serializedVersion: 2
@@ -1755,6 +1756,23 @@ MonoBehaviour:
   multiplier: 1
   _flockingType: 5
   target: {fileID: 0}
+--- !u!114 &6187371464346342323
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3169414732572980433}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e0be443bf70c2cf46bf0d9c16c16f51b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  range: 15
+  angle: 180
+  obsMask:
+    serializedVersion: 2
+    m_Bits: 128
 --- !u!1 &3228715066654085674
 GameObject:
   m_ObjectHideFlags: 0
