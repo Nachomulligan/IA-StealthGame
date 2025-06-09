@@ -1,7 +1,6 @@
 using UnityEngine;
-using static UnityEditor.Experimental.GraphView.GraphView;
 
-public class Bullet2 : MonoBehaviour
+public class WeaponBullet : MonoBehaviour
 {
     [SerializeField] private float speed = 10f;
     [SerializeField] private float lifetime = 3f;
