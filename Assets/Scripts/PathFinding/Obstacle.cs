@@ -2,15 +2,14 @@ using UnityEngine;
 
 public class Obstacle : MonoBehaviour
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    private void Start()
     {
-        
+        var coll = GetComponent<Collider>();
+        ObstacleManager.Instance.AddColl(coll);
     }
-
-    // Update is called once per frame
-    void Update()
+    private void OnDestroy()
     {
-        
+        var coll = GetComponent<Collider>();
+        ObstacleManager.Instance.RemoveColl(coll);
     }
 }
