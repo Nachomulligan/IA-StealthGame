@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 public class ObstacleManager : MonoBehaviour
@@ -6,28 +6,48 @@ public class ObstacleManager : MonoBehaviour
     Dictionary<Vector3, int> _obs = new Dictionary<Vector3, int>();
     static ObstacleManager instance;
     public bool skipY = true;
+    private static bool isQuitting = false; 
+
     public static ObstacleManager Instance
     {
         get
         {
+            if (isQuitting) return null;
+
             if (instance == null)
             {
                 instance = new GameObject("ObstacleManager").AddComponent<ObstacleManager>();
+                DontDestroyOnLoad(instance.gameObject); 
             }
             return instance;
         }
     }
+
     private void Awake()
     {
         if (instance != null && instance != this)
         {
-            Destroy(this);
+            Destroy(this.gameObject); // Destruir el GameObject completo
         }
         else
         {
             instance = this;
         }
     }
+
+    private void OnApplicationQuit()
+    {
+        isQuitting = true;
+    }
+
+    private void OnDestroy()
+    {
+        if (instance == this)
+        {
+            instance = null;
+        }
+    }
+
     public void AddColl(Collider coll)
     {
         var points = GetPointsOnCollider(coll, skipY);
@@ -43,6 +63,7 @@ public class ObstacleManager : MonoBehaviour
             }
         }
     }
+
     public void RemoveColl(Collider coll)
     {
         var points = GetPointsOnCollider(coll, skipY);
@@ -58,6 +79,7 @@ public class ObstacleManager : MonoBehaviour
             }
         }
     }
+
     public bool IsRightPos(Vector3 curr)
     {
         curr = Vector3Int.RoundToInt(curr);
@@ -67,17 +89,15 @@ public class ObstacleManager : MonoBehaviour
         }
         return !_obs.ContainsKey(curr);
     }
+
     List<Vector3> GetPointsOnCollider(Collider coll, bool skipY = true)
     {
         List<Vector3> points = new List<Vector3>();
         Bounds bounds = coll.bounds;
-
         int minX = Mathf.FloorToInt(bounds.min.x);
         int maxX = Mathf.CeilToInt(bounds.max.x);
-
         int minY = skipY ? 0 : Mathf.FloorToInt(bounds.min.y);
         int maxY = skipY ? 0 : Mathf.CeilToInt(bounds.max.y);
-
         int minZ = Mathf.FloorToInt(bounds.min.z);
         int maxZ = Mathf.CeilToInt(bounds.max.z);
 
@@ -95,9 +115,9 @@ public class ObstacleManager : MonoBehaviour
                 }
             }
         }
-
         return points;
     }
+
     private void OnDrawGizmosSelected()
     {
         if (_obs == null) return;
