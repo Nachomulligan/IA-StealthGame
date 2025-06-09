@@ -2209,6 +2209,10 @@ PrefabInstance:
       propertyPath: 'patrolWaypoints.Array.data[1]'
       value: 
       objectReference: {fileID: 1674133912}
+    - target: {fileID: -373059804792013951, guid: 5cd813a410e6be74b9ce14d1c630c6e6, type: 3}
+      propertyPath: _player
+      value: 
+      objectReference: {fileID: 1807989668}
     - target: {fileID: 3169414732572980433, guid: 5cd813a410e6be74b9ce14d1c630c6e6, type: 3}
       propertyPath: m_Name
       value: RangedEnemy (4)
@@ -6488,6 +6492,10 @@ PrefabInstance:
       propertyPath: 'patrolWaypoints.Array.data[1]'
       value: 
       objectReference: {fileID: 2033650582}
+    - target: {fileID: -373059804792013951, guid: 5cd813a410e6be74b9ce14d1c630c6e6, type: 3}
+      propertyPath: _player
+      value: 
+      objectReference: {fileID: 1807989668}
     - target: {fileID: 3169414732572980433, guid: 5cd813a410e6be74b9ce14d1c630c6e6, type: 3}
       propertyPath: m_Name
       value: RangedEnemy (2)

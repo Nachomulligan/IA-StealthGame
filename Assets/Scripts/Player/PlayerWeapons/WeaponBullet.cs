@@ -4,10 +4,7 @@ public class WeaponBullet : MonoBehaviour
 {
     [SerializeField] private float speed = 10f;
     [SerializeField] private float lifetime = 3f;
-    
-
     private float lifeTimer = 0f;
-
     private void Update()
     {
         transform.Translate(Vector3.forward * speed * Time.deltaTime);
@@ -18,7 +15,6 @@ public class WeaponBullet : MonoBehaviour
             Destroy(gameObject);
         }
     }
-
     private void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("Enemy"))

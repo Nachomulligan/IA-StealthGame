@@ -7,7 +7,6 @@ public class Bullet : MonoBehaviour
     private float lifetime;
     private float lifeTimer;
     private int damage;
-
     public void Initialize(Transform targetTransform, float bulletSpeed, float bulletLifetime, int bulletDamage)
     {
         target = targetTransform;
@@ -16,7 +15,6 @@ public class Bullet : MonoBehaviour
         damage = bulletDamage;
         lifeTimer = 0f;
     }
-
     private void Update()
     {
         lifeTimer += Time.deltaTime;
@@ -37,7 +35,6 @@ public class Bullet : MonoBehaviour
             transform.Translate(Vector3.forward * speed * Time.deltaTime);
         }
     }
-
     private void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("Player"))

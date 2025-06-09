@@ -31,7 +31,6 @@ public class PlayerModel : BaseEntityModel
         base.Awake();
         ServiceLocator.Instance.Register<PlayerModel>(this);
     }
-
     public void EquipWeapon(GameObject weapon)
     {
         if (currentWeapon != null)
@@ -47,7 +46,6 @@ public class PlayerModel : BaseEntityModel
 
         UnityEngine.Debug.Log($"Weapon equipped: {weapon.name}. Player is now armed: {_isArmed}");
     }
-
     public override void Die()
     {
         if (_isDead) return;
@@ -65,16 +63,14 @@ public class PlayerModel : BaseEntityModel
         OnPlayerDied?.Invoke();
         Destroy(gameObject);
     }
-
     public override void Attack()
     {
         if (!_canAttack)
         {
-            UnityEngine.Debug.Log("No puedes atacar, no tienes un arma.");
+            UnityEngine.Debug.Log("Cant Attack, No weapon");
             return;
         }
-
-        UnityEngine.Debug.Log("¡Player realizó un ataque!");
+        UnityEngine.Debug.Log("Player Attacked");
         var colls = Physics.OverlapSphere(transform.position, playerAttackRange, enemyLayer);
 
         foreach (var col in colls)
@@ -87,10 +83,8 @@ public class PlayerModel : BaseEntityModel
                 CounterManager.Instance.RegisterKill("Weapon 1");
             }
         }
-
         _onAttack();
     }
-
     public int GetKillCount()
     {
         if (_counterManager == null)

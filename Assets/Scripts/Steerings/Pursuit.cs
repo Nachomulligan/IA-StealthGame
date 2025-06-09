@@ -42,7 +42,7 @@ public class Pursuit : ISteering
 
     public virtual Vector3 GetDir()
     {
-        // Verificar si tenemos un target v?lido
+        
         if (_target == null || _target.gameObject == null)
         {
             return Vector3.zero;

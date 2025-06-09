@@ -16,12 +16,10 @@ public class GoonEnemyController : BaseFlockingEnemyController
     {
         return GetComponent<GoonEnemyModel>();
     }
-
     public bool IsLeaderValid()
     {
         return leaderTarget != null && leaderTarget.gameObject != null;
     }
-
     protected override void InitializedFSM()
     {
         var flockingManager = GetComponent<FlockingManager>();
@@ -55,33 +53,27 @@ public class GoonEnemyController : BaseFlockingEnemyController
     {
         var patrol = new ActionNode(() =>
         {
-           // Debug.Log($"[{Time.time:F2}] → TRANSITION: PATROL");
             _fsm.Transition(StateEnum.Patrol);
         });
 
         var evade = new ActionNode(() =>
         {
-          //  Debug.Log($"[{Time.time:F2}] → TRANSITION: EVADE");
             _fsm.Transition(StateEnum.Evade);
         });
 
         var goZone = new ActionNode(() =>
         {
-         //   Debug.Log($"[{Time.time:F2}] → TRANSITION: GO ZONE");
             _fsm.Transition(StateEnum.GoZone);
         });
 
         var idle = new ActionNode(() =>
         {
-          //  Debug.Log($"[{Time.time:F2}] → TRANSITION: IDLE");
             _fsm.Transition(StateEnum.Idle);
         });
 
 
         var qLeaderExists = new QuestionNode(
             () => IsLeaderValid(),
-
-            // leader logic
             new QuestionNode(
                 () => _fsm.CurrState() is GoonStateEvade<StateEnum>,
                 new QuestionNode(
@@ -95,8 +87,6 @@ public class GoonEnemyController : BaseFlockingEnemyController
                     patrol
                 )
             ),
-
-            // leaderless logic
             new QuestionNode(
                 () => _fsm.CurrState() is GoonStateEvade<StateEnum>,
                 new QuestionNode(
@@ -108,7 +98,6 @@ public class GoonEnemyController : BaseFlockingEnemyController
                     ),
                     evade
                 ),
-
                 new QuestionNode(
                     () => _fsm.CurrState() is GoonStateIdle<StateEnum>,
                     new QuestionNode(

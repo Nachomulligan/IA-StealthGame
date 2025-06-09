@@ -4,7 +4,6 @@ using UnityEngine;
 public class WeaponInventory : MonoBehaviour
 {
     public List<WeaponStack> weaponStacks = new List<WeaponStack>();
-
     public void AddWeapon(Weapon newWeapon)
     {
         WeaponStack existingStack = weaponStacks.Find(ws => ws.weapon == newWeapon);
@@ -20,7 +19,6 @@ public class WeaponInventory : MonoBehaviour
             Debug.Log($"Weapon {newWeapon.weaponName} added to inventory");
         }
     }
-
     public Weapon GetWeaponToEquip(int index)
     {
         if (index >= 0 && index < weaponStacks.Count)

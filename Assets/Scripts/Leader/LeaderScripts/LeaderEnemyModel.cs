@@ -10,7 +10,6 @@ public class LeaderEnemyModel : BaseEnemyModel
         Ranged,
         Explosion
     }
-
     [Header("Attack Prefabs and Settings")]
     [SerializeField] private GameObject bulletPrefab;
     [SerializeField] private Transform firePoint;
@@ -21,67 +20,53 @@ public class LeaderEnemyModel : BaseEnemyModel
     [Header("Explosion Attack")]
     [SerializeField] private GameObject explosionEffectPrefab;
     [SerializeField] private float explosionRadius = 8f;
-    [SerializeField] private int explosionDamage = 25;
 
     [Header("Dynamic Roulette Settings")]
     [SerializeField] private float baseWeight = 1f;
-    [SerializeField] private float killMultiplier = 0.3f; // Cuanto aumenta el peso por cada kill
-    [SerializeField] private float maxWeightBonus = 5f; // Máximo bonus que puede obtener un tipo
+    [SerializeField] private float killMultiplier = 0.3f; 
+    [SerializeField] private float maxWeightBonus = 5f; 
 
     private PlayerModel _player;
     private CounterManager _counterManager;
     private RouletteWheelSystem _rouletteSystem;
 
-    // Mapeo de armas a tipos de ataque
     private Dictionary<string, AttackType> weaponToAttackType = new Dictionary<string, AttackType>
     {
         { "Weapon 1", AttackType.Melee },    // Arma melee
         { "Weapon 2", AttackType.Ranged },   // Arma ranged (bullets)
         { "Weapon 3", AttackType.Explosion } // Traps
     };
-
     protected override void Awake()
     {
         base.Awake();
     }
-
     public void Start()
     {
         _player = ServiceLocator.Instance.GetService<PlayerModel>();
         _counterManager = ServiceLocator.Instance.GetService<CounterManager>();
         _rouletteSystem = RouletteWheelSystem.Instance;
     }
-
     public override void Attack()
     {
         AttackType selectedAttack = DecideAttackTypeWithRoulette();
         ExecuteAttack(selectedAttack);
     }
-
     private AttackType DecideAttackTypeWithRoulette()
     {
-        // Crear diccionario con los pesos para cada tipo de ataque
         Dictionary<AttackType, float> attackWeights = CalculateAttackWeights();
-
-        // Usar el sistema de ruleta para seleccionar
         AttackType selectedAttack = _rouletteSystem.Roulette(attackWeights);
-
-        // Debug para mostrar las probabilidades y la selección
         LogRouletteInfo(attackWeights, selectedAttack);
 
         return selectedAttack;
     }
-
     private Dictionary<AttackType, float> CalculateAttackWeights()
     {
         Dictionary<AttackType, float> weights = new Dictionary<AttackType, float>();
 
-        // Inicializar con pesos base
         weights[AttackType.Melee] = baseWeight;
         weights[AttackType.Ranged] = baseWeight;
         weights[AttackType.Explosion] = baseWeight;
 
-        // Obtener kills por tipo de arma y aumentar el peso correspondiente
         foreach (var weaponMapping in weaponToAttackType)
         {
             string weaponName = weaponMapping.Key;
@@ -95,7 +80,6 @@ public class LeaderEnemyModel : BaseEnemyModel
 
         return weights;
     }
-
     private void ExecuteAttack(AttackType attackType)
     {
         switch (attackType)
@@ -111,10 +95,9 @@ public class LeaderEnemyModel : BaseEnemyModel
                 break;
         }
     }
-
     private void ExecuteMeleeAttack()
     {
-        Debug.Log("Leader Enemy: Ejecutando ataque MELEE");
+        Debug.Log("Leader Enemy: MELEE TYPE ATTACK");
 
         var colls = Physics.OverlapSphere(Position, attackRange, enemyMask);
         for (int i = 0; i < colls.Length; i++)
@@ -123,14 +106,12 @@ public class LeaderEnemyModel : BaseEnemyModel
             if (playerController != null)
             {
                 playerController.KillPlayer();
-                Debug.Log("Leader Enemy: Ataque melee exitoso contra el jugador");
             }
         }
     }
-
     private void ExecuteRangedAttack()
     {
-        Debug.Log("Leader Enemy: Ejecutando ataque RANGED");
+        Debug.Log("Leader Enemy: RANGED TYPE ATTACK");
 
         if (_player._playerTransform != null && bulletPrefab != null && firePoint != null)
         {
@@ -141,11 +122,9 @@ public class LeaderEnemyModel : BaseEnemyModel
             if (bullet != null)
             {
                 bullet.Initialize(_player._playerTransform, bulletSpeed, bulletLifetime, bulletDamage);
-                Debug.Log("Leader Enemy: Bala disparada hacia el jugador");
             }
         }
     }
-
     private void ExecuteExplosionAttack()
     {
         StartCoroutine(ExplosionAttackCoroutine());
@@ -153,7 +132,7 @@ public class LeaderEnemyModel : BaseEnemyModel
 
     private System.Collections.IEnumerator ExplosionAttackCoroutine()
     {
-        Debug.Log("Leader Enemy: Ejecutando ataque EXPLOSION");
+        Debug.Log("Leader Enemy: RANGED TYPE EXPLOSION");
 
         if (explosionEffectPrefab != null)
         {
@@ -169,11 +148,9 @@ public class LeaderEnemyModel : BaseEnemyModel
             if (playerController != null)
             {
                 playerController.KillPlayer();
-                Debug.Log("Leader Enemy: Jugador eliminado por explosión después del delay");
             }
         }
     }
-
     private void LogRouletteInfo(Dictionary<AttackType, float> weights, AttackType selected)
     {
         float totalWeight = 0f;
@@ -182,17 +159,13 @@ public class LeaderEnemyModel : BaseEnemyModel
             totalWeight += weight;
         }
 
-        Debug.Log("=== LEADER ENEMY ROULETTE INFO ===");
+        Debug.Log("LEADER ENEMY ROULETTE ");
         foreach (var kvp in weights)
         {
             float percentage = (kvp.Value / totalWeight) * 100f;
             string weaponName = GetWeaponNameForAttackType(kvp.Key);
             int kills = _counterManager.GetKillsForWeapon(weaponName);
-
-            Debug.Log($"{kvp.Key}: {percentage:F1}% (Peso: {kvp.Value:F1}, Kills de {weaponName}: {kills})");
         }
-        Debug.Log($"SELECCIONADO: {selected}");
-        Debug.Log("================================");
     }
 
     private string GetWeaponNameForAttackType(AttackType attackType)
@@ -202,18 +175,14 @@ public class LeaderEnemyModel : BaseEnemyModel
             if (kvp.Value == attackType)
                 return kvp.Key;
         }
-        return "Unknown";
+        return "Weapon Unknown";
     }
-
-
-    // Métodos públicos para testing o configuración externa
     public void SetRouletteSettings(float newBaseWeight, float newKillMultiplier, float newMaxBonus)
     {
         baseWeight = newBaseWeight;
         killMultiplier = newKillMultiplier;
         maxWeightBonus = newMaxBonus;
     }
-
     public Dictionary<AttackType, float> GetCurrentAttackProbabilities()
     {
         Dictionary<AttackType, float> weights = CalculateAttackWeights();
@@ -229,7 +198,6 @@ public class LeaderEnemyModel : BaseEnemyModel
         {
             probabilities[kvp.Key] = (kvp.Value / totalWeight) * 100f;
         }
-
         return probabilities;
     }
 }
