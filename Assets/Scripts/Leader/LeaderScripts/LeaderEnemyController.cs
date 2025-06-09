@@ -3,9 +3,26 @@ using UnityEngine;
 
 public class LeaderEnemyController : BaseEnemyController
 {
+    [Header("Line of Sight Settings")]
+    public LineOfSightMono goonLineOfSight; // Line of sight específico para goons
+
     private NPCSSearching<StateEnum> searching;
     private float _lastTimeSawTarget = float.NegativeInfinity;
     private float _timeTargetVisibleThreshold = 2.5f;
+    private GoonManager _goonManager;
+
+    protected override void Awake()
+    {
+        base.Awake();
+        // Obtener el GoonManager del ServiceLocator
+        _goonManager = ServiceLocator.Instance.GetService<GoonManager>();
+
+        // Si no se asignó un LineOfSight específico para goons, usar el mismo que para el target
+        if (goonLineOfSight == null)
+        {
+            goonLineOfSight = _los;
+        }
+    }
 
     protected override BaseEnemyModel GetEnemyModel()
     {
@@ -85,9 +102,14 @@ public class LeaderEnemyController : BaseEnemyController
         var qSearchOver = new QuestionNode(() => searching?.IsSearchOver ?? false, qGoToZone, search);
         var qTargetOutOfPursuitRange = new QuestionNode(() => !QuestionTargetInPursuitRange(), qSearchOver, chase);
         var qCanAttack = new QuestionNode(() => QuestionCanAttack(), attack, qTargetOutOfPursuitRange);
+
+        // Lógica de detección del target (player)
         var qTargetInView = new QuestionNode(() => TargetWasSeenRecently() || _isChasing, qCanAttack, patrol);
 
-        _root = new QuestionNode(() => target != null, qTargetInView, patrol);
+        // Nueva pregunta: ¿Hay algún goon evadiendo que pueda ver?
+        var qGoonEvadingInSight = new QuestionNode(() => QuestionGoonEvadingInSight(), search, qTargetInView);
+
+        _root = new QuestionNode(() => target != null, qGoonEvadingInSight, patrol);
     }
 
     protected override void Update()
@@ -102,5 +124,16 @@ public class LeaderEnemyController : BaseEnemyController
     private bool TargetWasSeenRecently()
     {
         return (Time.time - _lastTimeSawTarget) < _timeTargetVisibleThreshold;
+    }
+
+    // Nueva función para verificar si hay goons evadiendo en el campo de visión
+    private bool QuestionGoonEvadingInSight()
+    {
+        if (_goonManager == null)
+        {
+            return false;
+        }
+
+        return _goonManager.HasEvadingGoonInSight(_los);
     }
 }

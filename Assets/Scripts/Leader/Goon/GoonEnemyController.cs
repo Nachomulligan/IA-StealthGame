@@ -12,6 +12,9 @@ public class GoonEnemyController : BaseFlockingEnemyController
     private GoonStateGoZone<StateEnum> _goZoneState;
     private GoonStateIdle<StateEnum> _idleState;
 
+    // Propiedad pública para verificar si está evadiendo
+    public bool IsEvading { get; private set; }
+
     protected override BaseFlockingEnemyModel GetEnemyModel()
     {
         return GetComponent<GoonEnemyModel>();
@@ -49,6 +52,20 @@ public class GoonEnemyController : BaseFlockingEnemyController
         _fsm.SetInit(patrol);
     }
 
+    protected override void Update()
+    {
+        base.Update();
+
+        // Actualizar el estado de evading basado en el estado actual de la FSM
+        IsEvading = _fsm.CurrState() is GoonStateEvade<StateEnum>;
+
+        // Notificar al model sobre el cambio de estado
+        if (_goon != null)
+        {
+            _goon.SetEvadingState(IsEvading);
+        }
+    }
+
     protected override void InitializedTree()
     {
         var patrol = new ActionNode(() =>
@@ -70,7 +87,6 @@ public class GoonEnemyController : BaseFlockingEnemyController
         {
             _fsm.Transition(StateEnum.Idle);
         });
-
 
         var qLeaderExists = new QuestionNode(
             () => IsLeaderValid(),
@@ -126,5 +142,3 @@ public class GoonEnemyController : BaseFlockingEnemyController
         _root = qLeaderExists;
     }
 }
-
-
