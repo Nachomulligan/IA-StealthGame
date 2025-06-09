@@ -10,9 +10,8 @@ public class RangedEnemyModel : BaseEnemyModel
     [SerializeField] private int bulletDamage = 10;
 
     [SerializeField] private PlayerModel _player;
-    protected override void Awake()
+    public void Start()
     {
-        base.Awake();
         _player = ServiceLocator.Instance.GetService<PlayerModel>();
     }
     public override void Attack()
