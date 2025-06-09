@@ -1023,7 +1023,7 @@ Transform:
   m_GameObject: {fileID: 79868848}
   serializedVersion: 2
   m_LocalRotation: {x: 0.47087735, y: -1.8421416e-30, z: 6.34331e-31, w: 0.8821987}
-  m_LocalPosition: {x: -108.69, y: 15.857058, z: -32.597168}
+  m_LocalPosition: {x: -108.69, y: 15.857058, z: -32.597164}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -2072,7 +2072,7 @@ PrefabInstance:
       objectReference: {fileID: 1807989668}
     - target: {fileID: 6285099466012896134, guid: 1fffdfe564cd4f246b6cbfa0ecf2a7a5, type: 3}
       propertyPath: attackRange
-      value: 5.37
+      value: 3.09
       objectReference: {fileID: 0}
     - target: {fileID: 6285099466012896134, guid: 1fffdfe564cd4f246b6cbfa0ecf2a7a5, type: 3}
       propertyPath: PlayerTransform
@@ -2708,7 +2708,7 @@ Transform:
   m_GameObject: {fileID: 501405469}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -89.1, y: 1.694, z: 76}
+  m_LocalPosition: {x: -89.1, y: 1.694, z: 73}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -4935,7 +4935,7 @@ Transform:
   m_GameObject: {fileID: 963194225}
   serializedVersion: 2
   m_LocalRotation: {x: 0.47087735, y: -2.1025748e-30, z: 1.1222583e-30, w: 0.8821987}
-  m_LocalPosition: {x: -108.69, y: 15.857058, z: -32.597168}
+  m_LocalPosition: {x: -108.69, y: 15.857058, z: -32.597164}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -6307,9 +6307,17 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 1807989660}
     - target: {fileID: 1942236589528780379, guid: e221ba1db9080b1479eb4c9229479cdb, type: 3}
+      propertyPath: evadeTime
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 1942236589528780379, guid: e221ba1db9080b1479eb4c9229479cdb, type: 3}
       propertyPath: leaderTarget
       value: 
       objectReference: {fileID: 1751013102}
+    - target: {fileID: 1942236589528780379, guid: e221ba1db9080b1479eb4c9229479cdb, type: 3}
+      propertyPath: zoneArrivalThreshold
+      value: 5
+      objectReference: {fileID: 0}
     - target: {fileID: 3169414732572980433, guid: e221ba1db9080b1479eb4c9229479cdb, type: 3}
       propertyPath: m_Name
       value: GoonEnemy (2)
@@ -6358,6 +6366,10 @@ PrefabInstance:
       propertyPath: target
       value: 
       objectReference: {fileID: 501405470}
+    - target: {fileID: 7968889567079371110, guid: e221ba1db9080b1479eb4c9229479cdb, type: 3}
+      propertyPath: maxObs
+      value: 7
+      objectReference: {fileID: 0}
     - target: {fileID: 8283597222554472951, guid: e221ba1db9080b1479eb4c9229479cdb, type: 3}
       propertyPath: speed
       value: 4
@@ -9952,9 +9964,17 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 1807989660}
     - target: {fileID: 1942236589528780379, guid: e221ba1db9080b1479eb4c9229479cdb, type: 3}
+      propertyPath: evadeTime
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 1942236589528780379, guid: e221ba1db9080b1479eb4c9229479cdb, type: 3}
       propertyPath: leaderTarget
       value: 
       objectReference: {fileID: 1751013102}
+    - target: {fileID: 1942236589528780379, guid: e221ba1db9080b1479eb4c9229479cdb, type: 3}
+      propertyPath: zoneArrivalThreshold
+      value: 5
+      objectReference: {fileID: 0}
     - target: {fileID: 1958960136314430448, guid: e221ba1db9080b1479eb4c9229479cdb, type: 3}
       propertyPath: speed
       value: 2.5
@@ -10011,10 +10031,18 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4446859116131143257, guid: e221ba1db9080b1479eb4c9229479cdb, type: 3}
+      propertyPath: radius
+      value: 10.5
+      objectReference: {fileID: 0}
     - target: {fileID: 5129872016635192343, guid: e221ba1db9080b1479eb4c9229479cdb, type: 3}
       propertyPath: target
       value: 
       objectReference: {fileID: 501405470}
+    - target: {fileID: 7968889567079371110, guid: e221ba1db9080b1479eb4c9229479cdb, type: 3}
+      propertyPath: maxObs
+      value: 7
+      objectReference: {fileID: 0}
     - target: {fileID: 8283597222554472951, guid: e221ba1db9080b1479eb4c9229479cdb, type: 3}
       propertyPath: speed
       value: 4
@@ -10125,9 +10153,17 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 1807989660}
     - target: {fileID: 1942236589528780379, guid: e221ba1db9080b1479eb4c9229479cdb, type: 3}
+      propertyPath: evadeTime
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 1942236589528780379, guid: e221ba1db9080b1479eb4c9229479cdb, type: 3}
       propertyPath: leaderTarget
       value: 
       objectReference: {fileID: 1751013102}
+    - target: {fileID: 1942236589528780379, guid: e221ba1db9080b1479eb4c9229479cdb, type: 3}
+      propertyPath: zoneArrivalThreshold
+      value: 5
+      objectReference: {fileID: 0}
     - target: {fileID: 3169414732572980433, guid: e221ba1db9080b1479eb4c9229479cdb, type: 3}
       propertyPath: m_Name
       value: GoonEnemy (1)
@@ -10176,6 +10212,10 @@ PrefabInstance:
       propertyPath: target
       value: 
       objectReference: {fileID: 501405470}
+    - target: {fileID: 7968889567079371110, guid: e221ba1db9080b1479eb4c9229479cdb, type: 3}
+      propertyPath: maxObs
+      value: 7
+      objectReference: {fileID: 0}
     - target: {fileID: 8283597222554472951, guid: e221ba1db9080b1479eb4c9229479cdb, type: 3}
       propertyPath: speed
       value: 4
@@ -11193,7 +11233,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8600143947868193996, guid: 7e7277f092c13d5419a73ac09e102d45, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -23.06
+      value: -23.059996
       objectReference: {fileID: 0}
     - target: {fileID: 8600143947868193996, guid: 7e7277f092c13d5419a73ac09e102d45, type: 3}
       propertyPath: m_LocalRotation.w
@@ -11733,6 +11773,6 @@ SceneRoots:
   - {fileID: 1426124680}
   - {fileID: 297904569}
   - {fileID: 1919369767}
-  - {fileID: 149024018}
   - {fileID: 1940876244}
   - {fileID: 1350176807}
+  - {fileID: 149024018}

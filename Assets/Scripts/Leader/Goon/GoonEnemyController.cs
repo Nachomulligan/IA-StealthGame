@@ -51,80 +51,82 @@ public class GoonEnemyController : BaseFlockingEnemyController
 
     protected override void InitializedTree()
     {
-        var patrol = new ActionNode(() =>
-        {
-            _fsm.Transition(StateEnum.Patrol);
-        });
+        // Acciones
+        var patrol = new ActionNode(() => _fsm.Transition(StateEnum.Patrol));
+        var evade = new ActionNode(() => _fsm.Transition(StateEnum.Evade));
+        var goZone = new ActionNode(() => _fsm.Transition(StateEnum.GoZone));
+        var idle = new ActionNode(() => _fsm.Transition(StateEnum.Idle));
 
-        var evade = new ActionNode(() =>
-        {
-            _fsm.Transition(StateEnum.Evade);
-        });
+        var qIsEvadeTimeOver = new QuestionNode(
+            () => _evadeState?.IsEvadeTimeOver ?? false,
+            patrol,
+            evade
+        );
 
-        var goZone = new ActionNode(() =>
-        {
-            _fsm.Transition(StateEnum.GoZone);
-        });
+        var qTargetInView = new QuestionNode(
+            () => QuestionTargetInView(),
+            evade,
+            patrol
+        );
 
-        var idle = new ActionNode(() =>
-        {
-            _fsm.Transition(StateEnum.Idle);
-        });
+        var qAtZone = new QuestionNode(
+            () => Vector3.Distance(_goon.transform.position, zone.position) <= zoneArrivalThreshold,
+            idle,
+            goZone
+        );
 
+        var qEvadeTimeOverNoLeader = new QuestionNode(
+            () => _evadeState?.IsEvadeTimeOver ?? false,
+            qAtZone,
+            evade
+        );
+
+        var qIdleTargetCheck = new QuestionNode(
+            () => QuestionTargetInView(),
+            evade,
+            idle
+        );
+
+        var qGoZoneTargetCheck = new QuestionNode(
+            () => QuestionTargetInView(),
+            evade,
+            new QuestionNode(
+                () => _goZoneState.HasArrivedAtZone,
+                idle,
+                goZone
+            )
+        );
+
+        var qCurrentStateGoZone = new QuestionNode(
+            () => _fsm.CurrState() is GoonStateGoZone<StateEnum>,
+            qGoZoneTargetCheck,
+            goZone
+        );
+
+        var qCurrentStateIdle = new QuestionNode(
+            () => _fsm.CurrState() is GoonStateIdle<StateEnum>,
+            qIdleTargetCheck,
+            qCurrentStateGoZone
+        );
+
+        var qCurrentStateEvadeNoLeader = new QuestionNode(
+            () => _fsm.CurrState() is GoonStateEvade<StateEnum>,
+            qEvadeTimeOverNoLeader,
+            qCurrentStateIdle
+        );
+
+        var qCurrentStateEvadeWithLeader = new QuestionNode(
+            () => _fsm.CurrState() is GoonStateEvade<StateEnum>,
+            qIsEvadeTimeOver,
+            qTargetInView
+        );
 
         var qLeaderExists = new QuestionNode(
             () => IsLeaderValid(),
-            new QuestionNode(
-                () => _fsm.CurrState() is GoonStateEvade<StateEnum>,
-                new QuestionNode(
-                    () => _evadeState?.IsEvadeTimeOver ?? false,
-                    patrol,
-                    evade
-                ),
-                new QuestionNode(
-                    () => QuestionTargetInView(),
-                    evade,
-                    patrol
-                )
-            ),
-            new QuestionNode(
-                () => _fsm.CurrState() is GoonStateEvade<StateEnum>,
-                new QuestionNode(
-                    () => _evadeState?.IsEvadeTimeOver ?? false,
-                    new QuestionNode(
-                        () => Vector3.Distance(_goon.transform.position, zone.position) <= zoneArrivalThreshold,
-                        idle,
-                        goZone
-                    ),
-                    evade
-                ),
-                new QuestionNode(
-                    () => _fsm.CurrState() is GoonStateIdle<StateEnum>,
-                    new QuestionNode(
-                        () => QuestionTargetInView(),
-                        evade,
-                        idle
-                    ),
-
-                    new QuestionNode(
-                        () => _fsm.CurrState() is GoonStateGoZone<StateEnum>,
-                        new QuestionNode(
-                            () => QuestionTargetInView(),
-                            evade,
-                            new QuestionNode(
-                                () => _goZoneState.HasArrivedAtZone,
-                                idle,
-                                goZone
-                            )
-                        ),
-                        goZone
-                    )
-                )
-            )
+            qCurrentStateEvadeWithLeader, 
+            qCurrentStateEvadeNoLeader   
         );
 
         _root = qLeaderExists;
     }
 }
-
-
