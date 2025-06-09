@@ -5,7 +5,8 @@ public class NPCController : BaseEnemyController
 {
     public Transform SearchTarget;
     private NPCSSearching<StateEnum> searching;
-    //ver si cambiar el negative infinity, antes no estaba
+
+    
     private float _lastTimeSawTarget = float.NegativeInfinity;
     private float _timeTargetVisibleThreshold = 2.5f;
     protected override BaseEnemyModel GetEnemyModel()
@@ -35,7 +36,7 @@ public class NPCController : BaseEnemyController
 
         var stateList = new List<PSBase<StateEnum>> { idle, patrol, attack, chase, goZone, evade, searching };
 
-        // Configurar transiciones (mismo código que tenías)
+        
         idle.AddTransition(StateEnum.Chase, chase);
         idle.AddTransition(StateEnum.Attack, attack);
         idle.AddTransition(StateEnum.GoZone, goZone);
@@ -92,6 +93,7 @@ public class NPCController : BaseEnemyController
         var goZone = new ActionNode(() => _fsm.Transition(StateEnum.GoZone));
         var evade = new ActionNode(() => _fsm.Transition(StateEnum.Evade));
         var search = new ActionNode(() => {
+
             // Ahora podemos acceder directamente al estado de búsqueda
             if (searching != null && target != null)
             {
@@ -103,7 +105,7 @@ public class NPCController : BaseEnemyController
 
         var qGoToZone = new QuestionNode(() => QuestionGoToZone(), goZone, idle);
         var qSearchOver = new QuestionNode(() =>
-         searching?.IsSearchOver ?? false, // Usar la referencia directa
+         searching?.IsSearchOver ?? false, 
          qGoToZone, search);
         var qTargetOutOfPursuitRange = new QuestionNode(() => !QuestionTargetInPursuitRange(), qSearchOver, chase);
         var qCanAttack = new QuestionNode(() => QuestionCanAttack(), attack, qTargetOutOfPursuitRange);

@@ -36,13 +36,13 @@ public class NPCReactionSystem : MonoBehaviour
         playerHasWeapon = isArmed;
     }
 
-    /// <summary>
+    
     /// Determina si el NPC debería evadir al jugador basado en si tiene un arma
-    /// </summary>
-    /// <returns>True si debería evadir, False si debería perseguir</returns>
+    
+    /// True si debería evadir, False si debería perseguir
     public bool DecideIfShouldEvade()
     {
-        // Si ya hemos tomado esta decisión, mantenerla
+        // Si ya tomamos esta decisión, mantenerla
         if (hasSeenPlayerFirstTime)
             return shouldEvade;
 
