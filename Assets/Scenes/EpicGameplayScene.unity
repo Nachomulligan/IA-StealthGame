@@ -2127,10 +2127,6 @@ PrefabInstance:
       value: LeaderEnemy
       objectReference: {fileID: 0}
     - target: {fileID: 3169414732572980433, guid: 1fffdfe564cd4f246b6cbfa0ecf2a7a5, type: 3}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 3169414732572980433, guid: 1fffdfe564cd4f246b6cbfa0ecf2a7a5, type: 3}
       propertyPath: m_TagString
       value: Enemy
       objectReference: {fileID: 0}
@@ -2175,24 +2171,8 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6285099466012896134, guid: 1fffdfe564cd4f246b6cbfa0ecf2a7a5, type: 3}
-      propertyPath: speed
-      value: 3
-      objectReference: {fileID: 0}
-    - target: {fileID: 6285099466012896134, guid: 1fffdfe564cd4f246b6cbfa0ecf2a7a5, type: 3}
-      propertyPath: _player
-      value: 
-      objectReference: {fileID: 1807989668}
-    - target: {fileID: 6285099466012896134, guid: 1fffdfe564cd4f246b6cbfa0ecf2a7a5, type: 3}
       propertyPath: attackRange
       value: 7.62
-      objectReference: {fileID: 0}
-    - target: {fileID: 6285099466012896134, guid: 1fffdfe564cd4f246b6cbfa0ecf2a7a5, type: 3}
-      propertyPath: PlayerTransform
-      value: 
-      objectReference: {fileID: 1807989661}
-    - target: {fileID: 6285099466012896134, guid: 1fffdfe564cd4f246b6cbfa0ecf2a7a5, type: 3}
-      propertyPath: useRangedAttack
-      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6285099466012896134, guid: 1fffdfe564cd4f246b6cbfa0ecf2a7a5, type: 3}
       propertyPath: explosionEffectPrefab
@@ -10917,17 +10897,6 @@ MonoBehaviour:
   interactionLayer:
     serializedVersion: 2
     m_Bits: 512
---- !u!114 &1807989668 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 6332772721359212939, guid: 7e7277f092c13d5419a73ac09e102d45, type: 3}
-  m_PrefabInstance: {fileID: 2076744128}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 735938429}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2cd78665e0a20524d896f1c221008fdd, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &1807989672
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -11639,10 +11608,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 135877124615023086, guid: e221ba1db9080b1479eb4c9229479cdb, type: 3}
-      propertyPath: speed
-      value: 2
-      objectReference: {fileID: 0}
     - target: {fileID: 412065882908349408, guid: e221ba1db9080b1479eb4c9229479cdb, type: 3}
       propertyPath: _flockingType
       value: 3
@@ -11660,10 +11625,6 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 1807989660}
     - target: {fileID: 1942236589528780379, guid: e221ba1db9080b1479eb4c9229479cdb, type: 3}
-      propertyPath: leaderRb
-      value: 
-      objectReference: {fileID: 1751013102}
-    - target: {fileID: 1942236589528780379, guid: e221ba1db9080b1479eb4c9229479cdb, type: 3}
       propertyPath: evadeTime
       value: 10
       objectReference: {fileID: 0}
@@ -11675,22 +11636,6 @@ PrefabInstance:
       propertyPath: timePrediction
       value: 1
       objectReference: {fileID: 0}
-    - target: {fileID: 1958960136314430448, guid: e221ba1db9080b1479eb4c9229479cdb, type: 3}
-      propertyPath: speed
-      value: 2.5
-      objectReference: {fileID: 0}
-    - target: {fileID: 2534989359131209644, guid: e221ba1db9080b1479eb4c9229479cdb, type: 3}
-      propertyPath: m_Mass
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 2534989359131209644, guid: e221ba1db9080b1479eb4c9229479cdb, type: 3}
-      propertyPath: m_Constraints
-      value: 116
-      objectReference: {fileID: 0}
-    - target: {fileID: 2534989359131209644, guid: e221ba1db9080b1479eb4c9229479cdb, type: 3}
-      propertyPath: m_IsKinematic
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 2583720015978397380, guid: e221ba1db9080b1479eb4c9229479cdb, type: 3}
       propertyPath: _flockingType
       value: 2
@@ -11698,10 +11643,6 @@ PrefabInstance:
     - target: {fileID: 3169414732572980433, guid: e221ba1db9080b1479eb4c9229479cdb, type: 3}
       propertyPath: m_Name
       value: GoonEnemy
-      objectReference: {fileID: 0}
-    - target: {fileID: 3169414732572980433, guid: e221ba1db9080b1479eb4c9229479cdb, type: 3}
-      propertyPath: m_IsActive
-      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3169414732572980433, guid: e221ba1db9080b1479eb4c9229479cdb, type: 3}
       propertyPath: m_TagString
@@ -11775,15 +11716,10 @@ PrefabInstance:
       propertyPath: _flockingType
       value: 1
       objectReference: {fileID: 0}
-    m_RemovedComponents:
-    - {fileID: 1958960136314430448, guid: e221ba1db9080b1479eb4c9229479cdb, type: 3}
-    - {fileID: 135877124615023086, guid: e221ba1db9080b1479eb4c9229479cdb, type: 3}
+    m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 3169414732572980433, guid: e221ba1db9080b1479eb4c9229479cdb, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 1948794300}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: e221ba1db9080b1479eb4c9229479cdb, type: 3}
 --- !u!1 &1925069233
 GameObject:
@@ -12010,28 +11946,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 6065566397332145215, guid: e41dd7c2b23c3d4469c28997d28ccde2, type: 3}
   m_PrefabInstance: {fileID: 1162879558}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &1948794287 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 3169414732572980433, guid: e221ba1db9080b1479eb4c9229479cdb, type: 3}
-  m_PrefabInstance: {fileID: 1919369767}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &1948794300
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1948794287}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e0be443bf70c2cf46bf0d9c16c16f51b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  range: 15
-  angle: 180
-  obsMask:
-    serializedVersion: 2
-    m_Bits: 128
 --- !u!1 &1980751217
 GameObject:
   m_ObjectHideFlags: 0
