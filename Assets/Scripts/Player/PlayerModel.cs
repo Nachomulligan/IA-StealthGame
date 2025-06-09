@@ -14,7 +14,8 @@ public class PlayerModel : BaseEntityModel
 
     [Header("Weapon System")]
     [SerializeField] private Transform weaponPoint;
-    [SerializeField] private GameObject currentWeapon;
+    public GameObject currentWeapon;
+    private CounterManager _counterManager;
 
     private bool _isArmed = false;
     private bool _canAttack = false;
@@ -82,9 +83,21 @@ public class PlayerModel : BaseEntityModel
             if (damageable != null)
             {
                 EventManager.InvokeNPCDeath(damageable);
+                _counterManager = ServiceLocator.Instance.GetService<CounterManager>();
+                CounterManager.Instance.RegisterKill("Weapon 1");
             }
         }
 
         _onAttack();
+    }
+
+    public int GetKillCount()
+    {
+        if (_counterManager == null)
+        {
+            _counterManager = ServiceLocator.Instance.GetService<CounterManager>();
+        }
+
+        return _counterManager != null ? _counterManager.GetTotalKills() : 0;
     }
 }

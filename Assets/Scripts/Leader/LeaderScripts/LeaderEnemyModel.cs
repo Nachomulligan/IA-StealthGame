@@ -1,62 +1,235 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
+
 public class LeaderEnemyModel : BaseEnemyModel
 {
-    [Header("Leader Attack Settings")]
-    [SerializeField] private bool useRangedAttack = false;
+    public enum AttackType
+    {
+        Melee,
+        Ranged,
+        Explosion
+    }
 
-    [Header("Ranged Attack")]
+    [Header("Attack Prefabs and Settings")]
     [SerializeField] private GameObject bulletPrefab;
     [SerializeField] private Transform firePoint;
     [SerializeField] private float bulletSpeed = 10f;
     [SerializeField] private float bulletLifetime = 3f;
     [SerializeField] private int bulletDamage = 10;
 
+    [Header("Explosion Attack")]
+    [SerializeField] private GameObject explosionEffectPrefab;
+    [SerializeField] private float explosionRadius = 8f;
+    [SerializeField] private int explosionDamage = 25;
+
+    [Header("Dynamic Roulette Settings")]
+    [SerializeField] private float baseWeight = 1f;
+    [SerializeField] private float killMultiplier = 0.3f; // Cuanto aumenta el peso por cada kill
+    [SerializeField] private float maxWeightBonus = 5f; // Máximo bonus que puede obtener un tipo
+
     private PlayerModel _player;
+    private CounterManager _counterManager;
+    private RouletteWheelSystem _rouletteSystem;
+
+    // Mapeo de armas a tipos de ataque
+    private Dictionary<string, AttackType> weaponToAttackType = new Dictionary<string, AttackType>
+    {
+        { "Weapon 1", AttackType.Melee },    // Arma melee
+        { "Weapon 2", AttackType.Ranged },   // Arma ranged (bullets)
+        { "Weapon 3", AttackType.Explosion } // Traps
+    };
 
     protected override void Awake()
     {
         base.Awake();
     }
+
     public void Start()
     {
         _player = ServiceLocator.Instance.GetService<PlayerModel>();
+        _counterManager = ServiceLocator.Instance.GetService<CounterManager>();
+        _rouletteSystem = RouletteWheelSystem.Instance;
     }
+
     public override void Attack()
     {
-        if (useRangedAttack)
-        {
-            // Ataque a distancia
-            if (_player._playerTransform != null && bulletPrefab != null && firePoint != null)
-            {
-                _look.LookDir((_player._playerTransform.position - transform.position).normalized);
-                GameObject bulletObj = Instantiate(bulletPrefab, firePoint.position, firePoint.rotation);
-                Bullet bullet = bulletObj.GetComponent<Bullet>();
+        AttackType selectedAttack = DecideAttackTypeWithRoulette();
+        ExecuteAttack(selectedAttack);
+    }
 
-                if (bullet != null)
-                {
-                    bullet.Initialize(_player._playerTransform, bulletSpeed, bulletLifetime, bulletDamage);
-                }
-            }
-        }
-        else
-        {
-            // Ataque cuerpo a cuerpo
-            var colls = Physics.OverlapSphere(Position, attackRange, enemyMask);
-            for (int i = 0; i < colls.Length; i++)
-            {
-                PlayerController playerController = colls[i].GetComponent<PlayerController>();
-                if (playerController != null)
-                {
-                    playerController.KillPlayer();
-                }
-            }
-        }
-    }
-    public void SetAttackType(bool useRanged)
+    private AttackType DecideAttackTypeWithRoulette()
     {
-        useRangedAttack = useRanged;
+        // Crear diccionario con los pesos para cada tipo de ataque
+        Dictionary<AttackType, float> attackWeights = CalculateAttackWeights();
+
+        // Usar el sistema de ruleta para seleccionar
+        AttackType selectedAttack = _rouletteSystem.Roulette(attackWeights);
+
+        // Debug para mostrar las probabilidades y la selección
+        LogRouletteInfo(attackWeights, selectedAttack);
+
+        return selectedAttack;
     }
-    public bool IsUsingRangedAttack => useRangedAttack;
+
+    private Dictionary<AttackType, float> CalculateAttackWeights()
+    {
+        Dictionary<AttackType, float> weights = new Dictionary<AttackType, float>();
+
+        // Inicializar con pesos base
+        weights[AttackType.Melee] = baseWeight;
+        weights[AttackType.Ranged] = baseWeight;
+        weights[AttackType.Explosion] = baseWeight;
+
+        // Obtener kills por tipo de arma y aumentar el peso correspondiente
+        foreach (var weaponMapping in weaponToAttackType)
+        {
+            string weaponName = weaponMapping.Key;
+            AttackType attackType = weaponMapping.Value;
+
+            int kills = _counterManager.GetKillsForWeapon(weaponName);
+            float bonus = Mathf.Min(kills * killMultiplier, maxWeightBonus);
+
+            weights[attackType] += bonus;
+        }
+
+        return weights;
+    }
+
+    private void ExecuteAttack(AttackType attackType)
+    {
+        switch (attackType)
+        {
+            case AttackType.Melee:
+                ExecuteMeleeAttack();
+                break;
+            case AttackType.Ranged:
+                ExecuteRangedAttack();
+                break;
+            case AttackType.Explosion:
+                ExecuteExplosionAttack();
+                break;
+        }
+    }
+
+    private void ExecuteMeleeAttack()
+    {
+        Debug.Log("Leader Enemy: Ejecutando ataque MELEE");
+
+        var colls = Physics.OverlapSphere(Position, attackRange, enemyMask);
+        for (int i = 0; i < colls.Length; i++)
+        {
+            PlayerController playerController = colls[i].GetComponent<PlayerController>();
+            if (playerController != null)
+            {
+                playerController.KillPlayer();
+                Debug.Log("Leader Enemy: Ataque melee exitoso contra el jugador");
+            }
+        }
+    }
+
+    private void ExecuteRangedAttack()
+    {
+        Debug.Log("Leader Enemy: Ejecutando ataque RANGED");
+
+        if (_player._playerTransform != null && bulletPrefab != null && firePoint != null)
+        {
+            _look.LookDir((_player._playerTransform.position - transform.position).normalized);
+            GameObject bulletObj = Instantiate(bulletPrefab, firePoint.position, firePoint.rotation);
+            Bullet bullet = bulletObj.GetComponent<Bullet>();
+
+            if (bullet != null)
+            {
+                bullet.Initialize(_player._playerTransform, bulletSpeed, bulletLifetime, bulletDamage);
+                Debug.Log("Leader Enemy: Bala disparada hacia el jugador");
+            }
+        }
+    }
+
+    private void ExecuteExplosionAttack()
+    {
+        StartCoroutine(ExplosionAttackCoroutine());
+    }
+
+    private System.Collections.IEnumerator ExplosionAttackCoroutine()
+    {
+        Debug.Log("Leader Enemy: Ejecutando ataque EXPLOSION");
+
+        if (explosionEffectPrefab != null)
+        {
+            Instantiate(explosionEffectPrefab, transform.position, Quaternion.identity);
+        }
+
+        yield return new WaitForSeconds(1f);
+
+        var colls = Physics.OverlapSphere(transform.position, explosionRadius, enemyMask);
+        for (int i = 0; i < colls.Length; i++)
+        {
+            PlayerController playerController = colls[i].GetComponent<PlayerController>();
+            if (playerController != null)
+            {
+                playerController.KillPlayer();
+                Debug.Log("Leader Enemy: Jugador eliminado por explosión después del delay");
+            }
+        }
+    }
+
+    private void LogRouletteInfo(Dictionary<AttackType, float> weights, AttackType selected)
+    {
+        float totalWeight = 0f;
+        foreach (var weight in weights.Values)
+        {
+            totalWeight += weight;
+        }
+
+        Debug.Log("=== LEADER ENEMY ROULETTE INFO ===");
+        foreach (var kvp in weights)
+        {
+            float percentage = (kvp.Value / totalWeight) * 100f;
+            string weaponName = GetWeaponNameForAttackType(kvp.Key);
+            int kills = _counterManager.GetKillsForWeapon(weaponName);
+
+            Debug.Log($"{kvp.Key}: {percentage:F1}% (Peso: {kvp.Value:F1}, Kills de {weaponName}: {kills})");
+        }
+        Debug.Log($"SELECCIONADO: {selected}");
+        Debug.Log("================================");
+    }
+
+    private string GetWeaponNameForAttackType(AttackType attackType)
+    {
+        foreach (var kvp in weaponToAttackType)
+        {
+            if (kvp.Value == attackType)
+                return kvp.Key;
+        }
+        return "Unknown";
+    }
+
+
+    // Métodos públicos para testing o configuración externa
+    public void SetRouletteSettings(float newBaseWeight, float newKillMultiplier, float newMaxBonus)
+    {
+        baseWeight = newBaseWeight;
+        killMultiplier = newKillMultiplier;
+        maxWeightBonus = newMaxBonus;
+    }
+
+    public Dictionary<AttackType, float> GetCurrentAttackProbabilities()
+    {
+        Dictionary<AttackType, float> weights = CalculateAttackWeights();
+        Dictionary<AttackType, float> probabilities = new Dictionary<AttackType, float>();
+
+        float totalWeight = 0f;
+        foreach (var weight in weights.Values)
+        {
+            totalWeight += weight;
+        }
+
+        foreach (var kvp in weights)
+        {
+            probabilities[kvp.Key] = (kvp.Value / totalWeight) * 100f;
+        }
+
+        return probabilities;
+    }
 }

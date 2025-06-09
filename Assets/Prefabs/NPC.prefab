@@ -1518,7 +1518,7 @@ GameObject:
   - component: {fileID: 1598003877612634028}
   m_Layer: 8
   m_Name: NPC
-  m_TagString: Untagged
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1608,10 +1608,9 @@ MonoBehaviour:
   patrolWaypoints:
   - {fileID: 0}
   - {fileID: 0}
-  _restTimeOut: 0
-  _patrolTimeOut: 0
   restTime: 5
   waitTime: 5
+  SearchTarget: {fileID: 0}
 --- !u!114 &5024502304421211338
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1625,10 +1624,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   speed: 4
-  playerAttackRange: 5
-  enemyLayer:
-    serializedVersion: 2
-    m_Bits: 64
   attackRange: 2.5
   pursuitRange: 9
   enemyMask:
