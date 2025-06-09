@@ -9,6 +9,9 @@ EditorBuildSettings:
     path: Assets/Scenes/EpicGameplayScene.unity
     guid: 4f895fecb98cf9b4287392f235db1ef4
   - enabled: 1
+    path: Assets/Scenes/SplashScreen.unity
+    guid: 808aa7f3e7568fa478cf3fcc899f802e
+  - enabled: 1
     path: Assets/Scenes/Title.unity
     guid: 9947e27bb3bd6b64996a6c55d82e49a2
   - enabled: 1
