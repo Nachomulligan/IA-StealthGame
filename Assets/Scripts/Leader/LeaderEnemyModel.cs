@@ -1,7 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
-
-
 public class LeaderEnemyModel : BaseEnemyModel
 {
     public enum AttackType
@@ -10,6 +10,7 @@ public class LeaderEnemyModel : BaseEnemyModel
         Ranged,
         Explosion
     }
+
     [Header("Attack Prefabs and Settings")]
     [SerializeField] private GameObject bulletPrefab;
     [SerializeField] private Transform firePoint;
@@ -22,12 +23,15 @@ public class LeaderEnemyModel : BaseEnemyModel
 
     [Header("Dynamic Roulette Settings")]
     [SerializeField] private float baseWeight = 1f;
-    [SerializeField] private float killMultiplier = 0.3f; 
-    [SerializeField] private float maxWeightBonus = 5f; 
+    [SerializeField] private float killMultiplier = 0.3f;
+    [SerializeField] private float maxWeightBonus = 5f;
 
     private PlayerModel _player;
     private CounterManager _counterManager;
     private RouletteWheelSystem _rouletteSystem;
+
+
+    private AttackSystem _attackSystem;
 
     private Dictionary<string, AttackType> weaponToAttackType = new Dictionary<string, AttackType>
     {
@@ -35,21 +39,35 @@ public class LeaderEnemyModel : BaseEnemyModel
         { "Weapon 2", AttackType.Ranged },   // Arma ranged (bullets)
         { "Weapon 3", AttackType.Explosion } // Traps
     };
+
     protected override void Awake()
     {
         base.Awake();
+        InitializeAttackSystem();
     }
+
+    private void InitializeAttackSystem()
+    {
+        _attackSystem = new AttackSystem();
+
+        _attackSystem.RegisterAttack(AttackType.Melee, ExecuteMeleeAttack);
+        _attackSystem.RegisterAttack(AttackType.Ranged, ExecuteRangedAttack);
+        _attackSystem.RegisterAttack(AttackType.Explosion, ExecuteExplosionAttack);
+    }
+
     public void Start()
     {
         _player = ServiceLocator.Instance.GetService<PlayerModel>();
         _counterManager = ServiceLocator.Instance.GetService<CounterManager>();
         _rouletteSystem = RouletteWheelSystem.Instance;
     }
+
     public override void Attack()
     {
         AttackType selectedAttack = DecideAttackTypeWithRoulette();
         ExecuteAttack(selectedAttack);
     }
+
     private AttackType DecideAttackTypeWithRoulette()
     {
         Dictionary<AttackType, float> attackWeights = CalculateAttackWeights();
@@ -58,6 +76,7 @@ public class LeaderEnemyModel : BaseEnemyModel
 
         return selectedAttack;
     }
+
     private Dictionary<AttackType, float> CalculateAttackWeights()
     {
         Dictionary<AttackType, float> weights = new Dictionary<AttackType, float>();
@@ -81,19 +100,13 @@ public class LeaderEnemyModel : BaseEnemyModel
     }
     private void ExecuteAttack(AttackType attackType)
     {
-        switch (attackType)
-        {
-            case AttackType.Melee:
-                ExecuteMeleeAttack();
-                break;
-            case AttackType.Ranged:
-                ExecuteRangedAttack();
-                break;
-            case AttackType.Explosion:
-                ExecuteExplosionAttack();
-                break;
-        }
+        _attackSystem.ExecuteAttack(attackType);
     }
+    public void AddAttackType(AttackType attackType, Action attackAction)
+    {
+        _attackSystem.RegisterAttack(attackType, attackAction);
+    }
+
     private void ExecuteMeleeAttack()
     {
         Debug.Log("Leader Enemy: MELEE TYPE ATTACK");
@@ -108,6 +121,7 @@ public class LeaderEnemyModel : BaseEnemyModel
             }
         }
     }
+
     private void ExecuteRangedAttack()
     {
         Debug.Log("Leader Enemy: RANGED TYPE ATTACK");
@@ -124,12 +138,13 @@ public class LeaderEnemyModel : BaseEnemyModel
             }
         }
     }
+
     private void ExecuteExplosionAttack()
     {
         StartCoroutine(ExplosionAttackCoroutine());
     }
 
-    private System.Collections.IEnumerator ExplosionAttackCoroutine()
+    private IEnumerator ExplosionAttackCoroutine()
     {
         Debug.Log("Leader Enemy: RANGED TYPE EXPLOSION");
 
@@ -150,6 +165,7 @@ public class LeaderEnemyModel : BaseEnemyModel
             }
         }
     }
+
     private void LogRouletteInfo(Dictionary<AttackType, float> weights, AttackType selected)
     {
         float totalWeight = 0f;
