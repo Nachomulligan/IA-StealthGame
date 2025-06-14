@@ -3,18 +3,17 @@ using UnityEngine;
 public class NPCSSearching<T> : StateFollowPoints<T>
 {
     private Transform _searchTarget;
-    private int _entityId;
+    private TargetTracker _targetTracker;
     private bool _isPathfindingActive;
     private float _searchTimer;
     private float _searchDuration;
     private bool _searchOver;
-    private TargetTrackingService _trackingService;
 
-    public NPCSSearching(Transform entity, Transform searchTarget, int entityId, float searchDuration = 5f, float distanceToPoint = 0.2f)
+    public NPCSSearching(Transform entity, Transform searchTarget, TargetTracker targetTracker, float searchDuration = 5f, float distanceToPoint = 0.2f)
         : base(entity, distanceToPoint)
     {
         _searchTarget = searchTarget;
-        _entityId = entityId;
+        _targetTracker = targetTracker;
         _searchDuration = searchDuration;
         _searchOver = false;
     }
@@ -24,9 +23,6 @@ public class NPCSSearching<T> : StateFollowPoints<T>
         base.Initialize(p);
         _move = p[0] as IMove;
         _look = p[1] as ILook;
-
-        // Obtener el servicio de tracking
-        _trackingService = ServiceLocator.Instance.GetService<TargetTrackingService>();
     }
 
     public override void Enter()
@@ -36,10 +32,10 @@ public class NPCSSearching<T> : StateFollowPoints<T>
         _searchOver = false;
         _isPathfindingActive = false;
 
-        // Iniciar el modo búsqueda en el servicio
-        if (_trackingService != null)
+        // Iniciar el modo búsqueda en el tracker
+        if (_targetTracker != null)
         {
-            _trackingService.StartSearchMode(_entityId);
+            _targetTracker.StartSearchMode();
         }
 
         if (_searchTarget != null)
@@ -63,7 +59,7 @@ public class NPCSSearching<T> : StateFollowPoints<T>
 
         // Verificar si el tiempo de búsqueda se agotó O si no hay más tiempo de "visto recientemente"
         bool timeUp = _searchTimer >= _searchDuration;
-        bool noRecentSighting = _trackingService != null && !_trackingService.WasTargetSeenRecently(_entityId);
+        bool noRecentSighting = _targetTracker != null && !_targetTracker.WasTargetSeenRecently();
 
         if (timeUp || noRecentSighting)
         {
@@ -119,9 +115,9 @@ public class NPCSSearching<T> : StateFollowPoints<T>
         _isPathfindingActive = false;
 
         // Detener el modo búsqueda y resetear el timer
-        if (_trackingService != null)
+        if (_targetTracker != null)
         {
-            _trackingService.StopSearchMode(_entityId);
+            _targetTracker.StopSearchMode();
         }
 
         if (_move != null)
@@ -132,7 +128,7 @@ public class NPCSSearching<T> : StateFollowPoints<T>
 
     public bool TargetWasSeenRecently()
     {
-        return _trackingService?.WasTargetSeenRecently(_entityId) ?? false;
+        return _targetTracker?.WasTargetSeenRecently() ?? false;
     }
 
     private void StartPathfinding()

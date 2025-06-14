@@ -1516,6 +1516,7 @@ GameObject:
   - component: {fileID: -373059804792013951}
   - component: {fileID: -4913178025557301191}
   - component: {fileID: -164984246491288812}
+  - component: {fileID: 7813974160507975526}
   m_Layer: 8
   m_Name: RangedEnemy
   m_TagString: Enemy
@@ -1663,7 +1664,6 @@ MonoBehaviour:
   firePoint: {fileID: 5078587299401836344}
   bulletSpeed: 10
   bulletLifetime: 3
-  bulletDamage: 10
   _player: {fileID: 0}
 --- !u!114 &-4913178025557301191
 MonoBehaviour:
@@ -1685,6 +1685,7 @@ MonoBehaviour:
   - {fileID: 0}
   restTime: 5
   waitTime: 5
+  SearchTarget: {fileID: 0}
 --- !u!114 &-164984246491288812
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1702,6 +1703,19 @@ MonoBehaviour:
   evadeWeightWithWeapon: 70
   hasSeenPlayerFirstTime: 0
   shouldEvade: 0
+--- !u!114 &7813974160507975526
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3169414732572980433}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 079b1253d451a47428091db0f00c8a86, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  visibilityThreshold: 3
 --- !u!1 &3228715066654085674
 GameObject:
   m_ObjectHideFlags: 0
