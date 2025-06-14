@@ -2,10 +2,10 @@ using UnityEngine;
 
 public class Pursuit : ISteering
 {
-    Transform _self;
-    Rigidbody _target;
-    float _timePrediction;
-    float _errorRange = 0.1f;
+   protected Transform _self;
+   protected Rigidbody _target;
+   protected float _timePrediction;
+   protected float _errorRange = 0.1f;
 
     public Pursuit(Transform self, Rigidbody target, float errorRange = 0, float timePrediction = 0)
     {
