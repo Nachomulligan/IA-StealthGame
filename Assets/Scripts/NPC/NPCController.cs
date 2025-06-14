@@ -5,10 +5,38 @@ public class NPCController : BaseEnemyController
 {
     public Transform SearchTarget;
     private NPCSSearching<StateEnum> searching;
+    private int _entityId;
+    private TargetTrackingService _trackingService;
 
-    
-    private float _lastTimeSawTarget = float.NegativeInfinity;
-    private float _timeTargetVisibleThreshold = 2.5f;
+    protected override void Awake()
+    {
+        base.Awake();
+        _entityId = GetInstanceID(); // Usar el ID único del GameObject
+    }
+
+    protected override void Start()
+    {
+        base.Start();
+
+        // Obtener el servicio de tracking
+        _trackingService = ServiceLocator.Instance.GetService<TargetTrackingService>();
+
+        // Registrar este NPC en el servicio de tracking
+        if (_trackingService != null && target != null)
+        {
+            _trackingService.RegisterTracker(_entityId, target, _los, transform, 2.5f);
+        }
+    }
+
+    private void OnDestroy()
+    {
+        // Limpiar el registro cuando se destruye el objeto
+        if (_trackingService != null)
+        {
+            _trackingService.UnregisterTracker(_entityId);
+        }
+    }
+
     protected override BaseEnemyModel GetEnemyModel()
     {
         return GetComponent<NPCModel>();
@@ -23,7 +51,10 @@ public class NPCController : BaseEnemyController
         var attack = new NPCSAttack<StateEnum>();
         var chase = new NPCSSteering<StateEnum>(new Pursuit(_model.transform, target, 0, timePrediction));
         var goZone = new NPCSSeek<StateEnum>(zone);
-        searching = new NPCSSearching<StateEnum>(_model.transform, 10f);
+
+        // Ahora el estado de búsqueda solo necesita los parámetros esenciales
+        searching = new NPCSSearching<StateEnum>(_model.transform, SearchTarget, _entityId, 10f);
+
         List<Vector3> waypoints = new List<Vector3>();
         foreach (var wp in patrolWaypoints)
         {
@@ -36,7 +67,7 @@ public class NPCController : BaseEnemyController
 
         var stateList = new List<PSBase<StateEnum>> { idle, patrol, attack, chase, goZone, evade, searching };
 
-        
+        // Configuración de transiciones
         idle.AddTransition(StateEnum.Chase, chase);
         idle.AddTransition(StateEnum.Attack, attack);
         idle.AddTransition(StateEnum.GoZone, goZone);
@@ -68,7 +99,6 @@ public class NPCController : BaseEnemyController
         patrol.AddTransition(StateEnum.Idle, idle);
         patrol.AddTransition(StateEnum.Chase, chase);
         patrol.AddTransition(StateEnum.Evade, evade);
-        patrol.AddTransition(StateEnum.Searching, searching);
 
         evade.AddTransition(StateEnum.Chase, chase);
         evade.AddTransition(StateEnum.Searching, searching);
@@ -88,25 +118,19 @@ public class NPCController : BaseEnemyController
         var attack = new ActionNode(() => _fsm.Transition(StateEnum.Attack));
         var chase = new ActionNode(() => {
             _isChasing = true;
+            // Actualizar el timer cuando empezamos a perseguir
+            if (_trackingService != null)
+            {
+                _trackingService.UpdateLastSeenTime(_entityId);
+            }
             _fsm.Transition(StateEnum.Chase);
         });
         var goZone = new ActionNode(() => _fsm.Transition(StateEnum.GoZone));
         var evade = new ActionNode(() => _fsm.Transition(StateEnum.Evade));
-        var search = new ActionNode(() => {
-
-            // Ahora podemos acceder directamente al estado de búsqueda
-            if (searching != null && target != null)
-            {
-                searching.SetSearchTarget(SearchTarget);
-            }
-            _fsm.Transition(StateEnum.Searching);
-        });
-
+        var search = new ActionNode(() => _fsm.Transition(StateEnum.Searching));
 
         var qGoToZone = new QuestionNode(() => QuestionGoToZone(), goZone, idle);
-        var qSearchOver = new QuestionNode(() =>
-         searching?.IsSearchOver ?? false, 
-         qGoToZone, search);
+        var qSearchOver = new QuestionNode(() => searching?.IsSearchOver ?? false, qGoToZone, search);
         var qTargetOutOfPursuitRange = new QuestionNode(() => !QuestionTargetInPursuitRange(), qSearchOver, chase);
         var qCanAttack = new QuestionNode(() => QuestionCanAttack(), attack, qTargetOutOfPursuitRange);
         var qShouldEvade = new QuestionNode(() => _reactionSystem.DecideIfShouldEvade(), evade, qCanAttack);
@@ -119,21 +143,12 @@ public class NPCController : BaseEnemyController
             patrol, idle);
 
         var qCurrentlyPatrolling = new QuestionNode(() => _fsm.CurrState() is NPCSPatrol<StateEnum>, qIsTired, qIsRested);
-        var qTargetInView = new QuestionNode(() => TargetWasSeenRecently() || _isChasing, qShouldEvade, qCurrentlyPatrolling);
+
+        // Verificar si el target está visible ACTUALMENTE (no basado en timer) O si está persiguiendo
+        var qTargetInView = new QuestionNode(() =>
+            QuestionTargetInView() || _isChasing || (_trackingService?.WasTargetSeenRecently(_entityId) ?? false),
+            qShouldEvade, qCurrentlyPatrolling);
 
         _root = new QuestionNode(() => target != null, qTargetInView, idle);
-    }
-    protected override void Update()
-    {
-        base.Update(); 
-        if (QuestionTargetInView())
-        {
-            _lastTimeSawTarget = Time.time;
-        }
-    }
-
-    private bool TargetWasSeenRecently()
-    {
-        return (Time.time - _lastTimeSawTarget) < _timeTargetVisibleThreshold;
     }
 }

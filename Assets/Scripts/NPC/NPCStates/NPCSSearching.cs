@@ -2,15 +2,19 @@
 using UnityEngine;
 public class NPCSSearching<T> : StateFollowPoints<T>
 {
-    private Transform _target;
+    private Transform _searchTarget;
+    private int _entityId;
     private bool _isPathfindingActive;
     private float _searchTimer;
     private float _searchDuration;
     private bool _searchOver;
+    private TargetTrackingService _trackingService;
 
-    public NPCSSearching(Transform entity, float searchDuration = 5f, float distanceToPoint = 0.2f)
+    public NPCSSearching(Transform entity, Transform searchTarget, int entityId, float searchDuration = 5f, float distanceToPoint = 0.2f)
         : base(entity, distanceToPoint)
     {
+        _searchTarget = searchTarget;
+        _entityId = entityId;
         _searchDuration = searchDuration;
         _searchOver = false;
     }
@@ -20,6 +24,9 @@ public class NPCSSearching<T> : StateFollowPoints<T>
         base.Initialize(p);
         _move = p[0] as IMove;
         _look = p[1] as ILook;
+
+        // Obtener el servicio de tracking
+        _trackingService = ServiceLocator.Instance.GetService<TargetTrackingService>();
     }
 
     public override void Enter()
@@ -29,10 +36,20 @@ public class NPCSSearching<T> : StateFollowPoints<T>
         _searchOver = false;
         _isPathfindingActive = false;
 
-        // Iniciar pathfinding hacia el target si existe
-        if (_target != null)
+        // Iniciar el modo búsqueda en el servicio
+        if (_trackingService != null)
+        {
+            _trackingService.StartSearchMode(_entityId);
+        }
+
+        if (_searchTarget != null)
         {
             StartPathfinding();
+        }
+        else
+        {
+            Debug.LogWarning("No search target set - ending search immediately");
+            _searchOver = true;
         }
 
         Debug.Log("Started searching for target");
@@ -44,14 +61,17 @@ public class NPCSSearching<T> : StateFollowPoints<T>
 
         _searchTimer += Time.deltaTime;
 
-        // Si se acabó el tiempo de búsqueda
-        if (_searchTimer >= _searchDuration)
+        // Verificar si el tiempo de búsqueda se agotó O si no hay más tiempo de "visto recientemente"
+        bool timeUp = _searchTimer >= _searchDuration;
+        bool noRecentSighting = _trackingService != null && !_trackingService.WasTargetSeenRecently(_entityId);
+
+        if (timeUp || noRecentSighting)
         {
             if (!_searchOver) // Solo ejecutar una vez
             {
                 _searchOver = true;
-                _move.Move(Vector3.zero);
-                Debug.Log("Search time over");
+                _move?.Move(Vector3.zero);
+                Debug.Log($"Search ended - Time up: {timeUp}, No recent sighting: {noRecentSighting}");
             }
             return;
         }
@@ -97,21 +117,27 @@ public class NPCSSearching<T> : StateFollowPoints<T>
         _searchTimer = 0f;
         _searchOver = false;
         _isPathfindingActive = false;
+
+        // Detener el modo búsqueda y resetear el timer
+        if (_trackingService != null)
+        {
+            _trackingService.StopSearchMode(_entityId);
+        }
+
         if (_move != null)
         {
             _move.Move(Vector3.zero);
         }
     }
 
-    // Método para establecer el objetivo de búsqueda (última posición conocida del target)
-    public void SetSearchTarget(Transform target)
+    public bool TargetWasSeenRecently()
     {
-        _target = target;
+        return _trackingService?.WasTargetSeenRecently(_entityId) ?? false;
     }
 
     private void StartPathfinding()
     {
-        if (_target == null)
+        if (_searchTarget == null)
         {
             Debug.LogWarning("Cannot start searching - no target set");
             _searchOver = true;
@@ -139,7 +165,7 @@ public class NPCSSearching<T> : StateFollowPoints<T>
     float Heuristic(Vector3 current)
     {
         float distanceMultiplier = 1;
-        float h = Vector3.Distance(current, _target.transform.position) * distanceMultiplier;
+        float h = Vector3.Distance(current, _searchTarget.transform.position) * distanceMultiplier;
         return h;
     }
 
@@ -152,10 +178,10 @@ public class NPCSSearching<T> : StateFollowPoints<T>
 
     bool IsSatisfied(Vector3 curr)
     {
-        var targetPos = _target.position;
+        var targetPos = _searchTarget.position;
         targetPos.y = curr.y;
         if (Vector3.Distance(curr, targetPos) > 1.25f) return false;
-        return InView(curr, _target.transform.position);
+        return InView(curr, _searchTarget.transform.position);
     }
 
     List<Vector3> GetConnections(Vector3 curr)

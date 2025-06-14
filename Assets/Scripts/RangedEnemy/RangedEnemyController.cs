@@ -1,14 +1,40 @@
-﻿// RangedEnemyController modificado
-using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 public class RangedEnemyController : BaseEnemyController
 {
+    public Transform SearchTarget;
     private NPCSSearching<StateEnum> searching;
-    private float _lastTimeSawTarget = float.NegativeInfinity;
-    private float _timeTargetVisibleThreshold = 2.5f;
+    private int _entityId;
+    private TargetTrackingService _trackingService;
 
+    protected override void Awake()
+    {
+        base.Awake();
+        _entityId = GetInstanceID(); 
+    }
+    protected override void Start()
+    {
+        base.Start();
+
+        // Obtener el servicio de tracking
+        _trackingService = ServiceLocator.Instance.GetService<TargetTrackingService>();
+
+        // Registrar este NPC en el servicio de tracking
+        if (_trackingService != null && target != null)
+        {
+            _trackingService.RegisterTracker(_entityId, target, _los, transform, 2.5f);
+        }
+    }
+
+    private void OnDestroy()
+    {
+        // Limpiar el registro cuando se destruye el objeto
+        if (_trackingService != null)
+        {
+            _trackingService.UnregisterTracker(_entityId);
+        }
+    }
     protected override BaseEnemyModel GetEnemyModel()
     {
         return GetComponent<RangedEnemyModel>();
@@ -23,7 +49,7 @@ public class RangedEnemyController : BaseEnemyController
         var attack = new NPCSAttack<StateEnum>();
         var chase = new NPCSSteering<StateEnum>(new Pursuit(_model.transform, target, 0, timePrediction));
         var goZone = new NPCSSeek<StateEnum>(zone);
-        searching = new NPCSSearching<StateEnum>(_model.transform, 10f);
+        searching = new NPCSSearching<StateEnum>(_model.transform, SearchTarget, _entityId, 10f);
 
         List<Vector3> waypoints = new List<Vector3>();
         foreach (var wp in patrolWaypoints)
@@ -92,13 +118,7 @@ public class RangedEnemyController : BaseEnemyController
         });
         var goZone = new ActionNode(() => _fsm.Transition(StateEnum.GoZone));
         var evade = new ActionNode(() => _fsm.Transition(StateEnum.Evade));
-        var search = new ActionNode(() => {
-            if (searching != null && target != null)
-            {
-                searching.SetSearchTarget(target.transform);
-            }
-            _fsm.Transition(StateEnum.Searching);
-        });
+        var search = new ActionNode(() => _fsm.Transition(StateEnum.Searching));
 
         var qGoToZone = new QuestionNode(() => QuestionGoToZone(), goZone, idle);
         var qSearchOver = new QuestionNode(() => searching?.IsSearchOver ?? false, qGoToZone, search);
@@ -110,7 +130,9 @@ public class RangedEnemyController : BaseEnemyController
         var qIsRested = new QuestionNode(() => (_fsm.CurrState() as RangedEnemysIdle<StateEnum>)?.IsRested ?? false, patrol, idle);
 
         var qCurrentlyPatrolling = new QuestionNode(() => _fsm.CurrState() is NPCSPatrol<StateEnum>, qIsTired, qIsRested);
-        var qTargetInView = new QuestionNode(() => TargetWasSeenRecently() || _isChasing, qShouldEvade, qCurrentlyPatrolling);
+        var qTargetInView = new QuestionNode(() =>
+            (_trackingService?.WasTargetSeenRecently(_entityId) ?? false) || _isChasing,
+            qShouldEvade, qCurrentlyPatrolling);
 
         _root = new QuestionNode(() => target != null, qTargetInView, idle);
     }
@@ -118,14 +140,5 @@ public class RangedEnemyController : BaseEnemyController
     protected override void Update()
     {
         base.Update();
-        if (QuestionTargetInView())
-        {
-            _lastTimeSawTarget = Time.time;
-        }
-    }
-
-    private bool TargetWasSeenRecently()
-    {
-        return (Time.time - _lastTimeSawTarget) < _timeTargetVisibleThreshold;
     }
 }
