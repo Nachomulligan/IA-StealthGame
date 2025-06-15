@@ -6,7 +6,8 @@ public class GoonStatePatrol<T> : State<T>
 {
     private FlockingManager _flockingManager;
     private GoonEnemyModel _goon;
-    private Rigidbody _leaderTarget; 
+    private Rigidbody _leaderTarget;
+
     public GoonStatePatrol(GoonEnemyModel goon, Rigidbody leaderTarget, FlockingManager flockingManager)
     {
         _flockingManager = flockingManager;
@@ -17,7 +18,9 @@ public class GoonStatePatrol<T> : State<T>
     public override void Enter()
     {
         base.Enter();
+        _flockingManager.SaveCurrentState();
 
+        // Configurar flockings para patrol
         _flockingManager.SetFlockingActive(FlockingType.Cohesion, true);
         _flockingManager.SetFlockingActive(FlockingType.Alignment, true);
         _flockingManager.SetFlockingActive(FlockingType.Avoidance, true);
@@ -57,6 +60,7 @@ public class GoonStatePatrol<T> : State<T>
     public override void Exit()
     {
         base.Exit();
+        _flockingManager.RestorePreviousState();
     }
 
     private bool IsLeaderValid()

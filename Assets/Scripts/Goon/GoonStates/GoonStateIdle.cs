@@ -17,6 +17,7 @@ public class GoonStateIdle<T> : State<T>
     {
         Debug.Log("Entering Idle state - Doing nothing");
         base.Enter();
+        _flockingManager.SaveCurrentState();
 
         _flockingManager.SetFlockingActive(FlockingType.Leader, false);
         _flockingManager.SetFlockingActive(FlockingType.Predator, false);
@@ -28,12 +29,13 @@ public class GoonStateIdle<T> : State<T>
 
     public override void Execute()
     {
-
     }
 
     public override void Exit()
     {
         base.Exit();
         Debug.Log("Exiting Idle state");
+
+        _flockingManager.RestorePreviousState();
     }
 }

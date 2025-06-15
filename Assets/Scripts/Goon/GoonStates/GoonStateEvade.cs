@@ -5,7 +5,6 @@ public class GoonStateEvade<T> : State<T>
     private FlockingManager _flockingManager;
     private GoonEnemyModel _goon;
     private Rigidbody _target;
-    private Evade _evade;
 
     private float _evadeTimer;
     private float _evadeDuration;
@@ -24,12 +23,13 @@ public class GoonStateEvade<T> : State<T>
         Debug.Log("evade");
         base.Enter();
 
+        _flockingManager.SaveCurrentState();
+
         _evadeTimer = 0f;
         _evadeTimeOver = false;
 
         _flockingManager.SetFlockingActive(FlockingType.Predator, true);
         _flockingManager.SetFlockingActive(FlockingType.Avoidance, true);
-
         _flockingManager.SetFlockingActive(FlockingType.Leader, false);
 
         _flockingManager.SetFlockingMultiplier(FlockingType.Predator, 10f);
@@ -49,14 +49,14 @@ public class GoonStateEvade<T> : State<T>
         _goon.Move(steering);
     }
 
-
     public override void Exit()
     {
         base.Exit();
 
+        _flockingManager.RestorePreviousState();
+
         _evadeTimer = 0f;
         _evadeTimeOver = false;
-
     }
 
     public bool IsEvadeTimeOver => _evadeTimeOver;

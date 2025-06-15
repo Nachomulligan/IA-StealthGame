@@ -15,12 +15,17 @@ public class FlockingManager : MonoBehaviour, ISteering
     Collider[] _colls;
     List<IBoid> _boids;
 
+    // Sistema de snapshots para guardar estados previos
+    private Dictionary<FlockingType, FlockingState> _previousStates;
+    private bool _hasSnapshot = false;
+
     private void Awake()
     {
         _behaviours = GetComponents<IFlocking>();
         _self = GetComponent<IBoid>();
         _colls = new Collider[maxBoids];
         _boids = new List<IBoid>();
+        _previousStates = new Dictionary<FlockingType, FlockingState>();
 
         InitializeFlockingDictionary();
     }
@@ -64,30 +69,93 @@ public class FlockingManager : MonoBehaviour, ISteering
         return null;
     }
 
+    // Métodos existentes (mantener compatibilidad)
     public void SetFlockingActive(FlockingType type, bool isActive)
     {
         var flocking = GetFlocking(type);
         if (flocking != null)
-            flocking.IsActive = isActive;
+            flocking.SetActive(isActive);
     }
 
     public void SetFlockingMultiplier(FlockingType type, float multiplier)
     {
         var flocking = GetFlocking(type);
-        if (flocking != null && flocking is FlockingBaseBehaviour baseBehaviour)
-        {
-            baseBehaviour.multiplier = multiplier;
-        }
+        if (flocking != null)
+            flocking.SetMultiplier(multiplier);
     }
 
     public float GetFlockingMultiplier(FlockingType type)
     {
         var flocking = GetFlocking(type);
-        if (flocking != null && flocking is FlockingBaseBehaviour baseBehaviour)
-        {
-            return baseBehaviour.multiplier;
-        }
+        if (flocking != null)
+            return flocking.GetMultiplier();
         return 0f;
+    }
+    public void SaveCurrentState()
+    {
+        _previousStates.Clear();
+
+        foreach (var kvp in _flockingDict)
+        {
+            var flockingType = kvp.Key;
+            var flocking = kvp.Value;
+
+            var state = new FlockingState(flocking.IsActive, flocking.GetMultiplier());
+            _previousStates[flockingType] = state;
+        }
+
+        _hasSnapshot = true;
+        Debug.Log("FlockingManager: Estado guardado correctamente");
+    }
+
+    public void RestorePreviousState()
+    {
+        if (!_hasSnapshot)
+        {
+            Debug.LogWarning("FlockingManager: No hay estado previo guardado para restaurar");
+            return;
+        }
+
+        foreach (var kvp in _previousStates)
+        {
+            var flockingType = kvp.Key;
+            var savedState = kvp.Value;
+
+            var flocking = GetFlocking(flockingType);
+            if (flocking != null)
+            {
+                flocking.SetActive(savedState.isActive);
+                flocking.SetMultiplier(savedState.multiplier);
+            }
+        }
+
+        Debug.Log("FlockingManager: Estado previo restaurado correctamente");
+    }
+
+    public bool HasSnapshot => _hasSnapshot;
+
+    public void ClearSnapshot()
+    {
+        _previousStates.Clear();
+        _hasSnapshot = false;
+    }
+
+    public void SaveAndSetFlocking(FlockingType type, bool isActive, float multiplier)
+    {
+        SaveCurrentState();
+        SetFlockingActive(type, isActive);
+        SetFlockingMultiplier(type, multiplier);
+    }
+
+    public void SaveAndSetMultipleFlockings(params (FlockingType type, bool isActive, float multiplier)[] settings)
+    {
+        SaveCurrentState();
+
+        foreach (var setting in settings)
+        {
+            SetFlockingActive(setting.type, setting.isActive);
+            SetFlockingMultiplier(setting.type, setting.multiplier);
+        }
     }
 
     public IBoid SetSelf { set => _self = value; }
