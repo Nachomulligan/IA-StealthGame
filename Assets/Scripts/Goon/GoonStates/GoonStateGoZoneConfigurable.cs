@@ -1,22 +1,26 @@
 ﻿using System;
 using UnityEngine;
 
-public class GoonStateGoZone<T> : State<T>
+public class GoonStateGoZoneConfigurable<T> : State<T>
 {
     private FlockingManager _flockingManager;
     private GoonEnemyModel _goon;
     private Transform _zone;
+    private FlockingConfiguration _flockingConfig;
     private SeekBehaviour _seekBehaviour;
+    private string _stateName = "GoZone";
 
     [Header("Zone Settings")]
     public float arrivalThreshold = 8f;
     private bool _hasArrivedAtZone = false;
 
-    public GoonStateGoZone(GoonEnemyModel goon, Transform zone, FlockingManager flockingManager, float threshold = 8f)
+    public GoonStateGoZoneConfigurable(GoonEnemyModel goon, Transform zone,
+        FlockingManager flockingManager, FlockingConfiguration flockingConfig, float threshold = 8f)
     {
         _flockingManager = flockingManager;
         _goon = goon;
         _zone = zone;
+        _flockingConfig = flockingConfig;
         arrivalThreshold = threshold;
 
         _seekBehaviour = goon.GetComponent<SeekBehaviour>();
@@ -31,13 +35,7 @@ public class GoonStateGoZone<T> : State<T>
         Debug.Log("Entering GoZone state");
         base.Enter();
 
-        _flockingManager.SaveCurrentState();
-
-        _flockingManager.SetFlockingActive(FlockingType.Leader, false);
-        _flockingManager.SetFlockingActive(FlockingType.Predator, false);
-        _flockingManager.SetFlockingActive(FlockingType.Alignment, true);
-        _flockingManager.SetFlockingActive(FlockingType.Cohesion, true);
-        _flockingManager.SetFlockingActive(FlockingType.Seek, true);
+        _flockingManager.ApplyConfiguration(_flockingConfig, _stateName);
 
         _seekBehaviour.Target = _zone;
         _hasArrivedAtZone = false;
@@ -68,9 +66,7 @@ public class GoonStateGoZone<T> : State<T>
     {
         base.Exit();
         Debug.Log("Exiting GoZone state");
-
         _flockingManager.RestorePreviousState();
-
         _hasArrivedAtZone = false;
     }
 

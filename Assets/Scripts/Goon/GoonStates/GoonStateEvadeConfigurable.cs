@@ -1,20 +1,24 @@
 ﻿using UnityEngine;
 
-public class GoonStateEvade<T> : State<T>
+public class GoonStateEvadeConfigurable<T> : State<T>
 {
     private FlockingManager _flockingManager;
     private GoonEnemyModel _goon;
     private Rigidbody _target;
+    private FlockingConfiguration _flockingConfig;
+    private string _stateName = "Evade";
 
     private float _evadeTimer;
     private float _evadeDuration;
     private bool _evadeTimeOver;
 
-    public GoonStateEvade(GoonEnemyModel goon, Rigidbody target, FlockingManager flockingManager, float evadeDuration = 3f)
+    public GoonStateEvadeConfigurable(GoonEnemyModel goon, Rigidbody target,
+        FlockingManager flockingManager, FlockingConfiguration flockingConfig, float evadeDuration = 3f)
     {
         _flockingManager = flockingManager;
         _goon = goon;
         _target = target;
+        _flockingConfig = flockingConfig;
         _evadeDuration = evadeDuration;
     }
 
@@ -23,17 +27,10 @@ public class GoonStateEvade<T> : State<T>
         Debug.Log("evade");
         base.Enter();
 
-        _flockingManager.SaveCurrentState();
+        _flockingManager.ApplyConfiguration(_flockingConfig, _stateName);
 
         _evadeTimer = 0f;
         _evadeTimeOver = false;
-
-        _flockingManager.SetFlockingActive(FlockingType.Predator, true);
-        _flockingManager.SetFlockingActive(FlockingType.Avoidance, true);
-        _flockingManager.SetFlockingActive(FlockingType.Leader, false);
-
-        _flockingManager.SetFlockingMultiplier(FlockingType.Predator, 10f);
-        _flockingManager.SetFlockingMultiplier(FlockingType.Avoidance, 2f);
     }
 
     public override void Execute()
@@ -52,9 +49,7 @@ public class GoonStateEvade<T> : State<T>
     public override void Exit()
     {
         base.Exit();
-
         _flockingManager.RestorePreviousState();
-
         _evadeTimer = 0f;
         _evadeTimeOver = false;
     }

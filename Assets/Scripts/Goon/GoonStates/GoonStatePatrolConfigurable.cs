@@ -2,47 +2,40 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class GoonStatePatrol<T> : State<T>
+public class GoonStatePatrolConfigurable<T> : State<T>
 {
     private FlockingManager _flockingManager;
     private GoonEnemyModel _goon;
     private Rigidbody _leaderTarget;
+    private FlockingConfiguration _flockingConfig;
+    private string _stateName = "Patrol";
 
-    public GoonStatePatrol(GoonEnemyModel goon, Rigidbody leaderTarget, FlockingManager flockingManager)
+    public GoonStatePatrolConfigurable(GoonEnemyModel goon, Rigidbody leaderTarget,
+        FlockingManager flockingManager, FlockingConfiguration flockingConfig)
     {
         _flockingManager = flockingManager;
         _goon = goon;
         _leaderTarget = leaderTarget;
+        _flockingConfig = flockingConfig;
     }
 
     public override void Enter()
     {
         base.Enter();
-        _flockingManager.SaveCurrentState();
-
-        // Configurar flockings para patrol
-        _flockingManager.SetFlockingActive(FlockingType.Cohesion, true);
-        _flockingManager.SetFlockingActive(FlockingType.Alignment, true);
-        _flockingManager.SetFlockingActive(FlockingType.Avoidance, true);
+        _flockingManager.ApplyConfiguration(_flockingConfig, _stateName);
 
         if (IsLeaderValid())
         {
-            _flockingManager.SetFlockingActive(FlockingType.Leader, true);
             var leaderBehaviour = _flockingManager.GetFlocking(FlockingType.Leader) as LeaderBehaviour;
             if (leaderBehaviour != null)
             {
                 leaderBehaviour.LeaderRb = _leaderTarget;
             }
-            _flockingManager.SetFlockingMultiplier(FlockingType.Leader, 15f);
         }
         else
         {
             _flockingManager.SetFlockingActive(FlockingType.Leader, false);
         }
-
-        _flockingManager.SetFlockingMultiplier(FlockingType.Cohesion, 1f);
-        _flockingManager.SetFlockingMultiplier(FlockingType.Alignment, 1f);
-        _flockingManager.SetFlockingMultiplier(FlockingType.Avoidance, 3f);
     }
 
     public override void Execute()
@@ -66,10 +59,5 @@ public class GoonStatePatrol<T> : State<T>
     private bool IsLeaderValid()
     {
         return _leaderTarget != null && _leaderTarget.gameObject != null;
-    }
-
-    public void UpdateLeaderTarget(Rigidbody newLeader)
-    {
-        _leaderTarget = newLeader;
     }
 }

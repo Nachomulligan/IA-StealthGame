@@ -7,30 +7,37 @@ public class GoonEnemyController : BaseFlockingEnemyController
     public float zoneArrivalThreshold = 2f;
     public Rigidbody leaderTarget;
 
+    [Header("Flocking Configuration")]
+    [SerializeField] private FlockingConfiguration flockingConfig;
+
     private GoonEnemyModel _goon;
-    private GoonStateEvade<StateEnum> _evadeState;
-    private GoonStateGoZone<StateEnum> _goZoneState;
-    private GoonStateIdle<StateEnum> _idleState;
+    private GoonStateEvadeConfigurable<StateEnum> _evadeState;
+    private GoonStateGoZoneConfigurable<StateEnum> _goZoneState;
+    private GoonStateIdleConfigurable<StateEnum> _idleState;
 
     protected override BaseFlockingEnemyModel GetEnemyModel()
     {
         return GetComponent<GoonEnemyModel>();
     }
+
     public bool IsLeaderValid()
     {
         return leaderTarget != null && leaderTarget.gameObject != null;
     }
+
     protected override void InitializedFSM()
     {
         var flockingManager = GetComponent<FlockingManager>();
         _goon = GetEnemyModel() as GoonEnemyModel;
         _fsm = new FSM<StateEnum>();
 
-        var patrol = new GoonStatePatrol<StateEnum>(_goon, leaderTarget, flockingManager);
-        _evadeState = new GoonStateEvade<StateEnum>(_goon, target, flockingManager, evadeTime);
-        _goZoneState = new GoonStateGoZone<StateEnum>(_goon, zone, flockingManager, zoneArrivalThreshold);
-        _idleState = new GoonStateIdle<StateEnum>(_goon, flockingManager);
+        // Estados configurables que usan el ScriptableObject
+        var patrol = new GoonStatePatrolConfigurable<StateEnum>(_goon, leaderTarget, flockingManager, flockingConfig);
+        _evadeState = new GoonStateEvadeConfigurable<StateEnum>(_goon, target, flockingManager, flockingConfig, evadeTime);
+        _goZoneState = new GoonStateGoZoneConfigurable<StateEnum>(_goon, zone, flockingManager, flockingConfig, zoneArrivalThreshold);
+        _idleState = new GoonStateIdleConfigurable<StateEnum>(_goon, flockingManager, flockingConfig);
 
+        // Transiciones (sin cambios)
         patrol.AddTransition(StateEnum.Evade, _evadeState);
         patrol.AddTransition(StateEnum.GoZone, _goZoneState);
 
@@ -98,25 +105,25 @@ public class GoonEnemyController : BaseFlockingEnemyController
         );
 
         var qCurrentStateGoZone = new QuestionNode(
-            () => _fsm.CurrState() is GoonStateGoZone<StateEnum>,
+            () => _fsm.CurrState() is GoonStateGoZoneConfigurable<StateEnum>,
             qGoZoneTargetCheck,
             goZone
         );
 
         var qCurrentStateIdle = new QuestionNode(
-            () => _fsm.CurrState() is GoonStateIdle<StateEnum>,
+            () => _fsm.CurrState() is GoonStateIdleConfigurable<StateEnum>,
             qIdleTargetCheck,
             qCurrentStateGoZone
         );
 
         var qCurrentStateEvadeNoLeader = new QuestionNode(
-            () => _fsm.CurrState() is GoonStateEvade<StateEnum>,
+            () => _fsm.CurrState() is GoonStateEvadeConfigurable<StateEnum>,
             qEvadeTimeOverNoLeader,
             qCurrentStateIdle
         );
 
         var qCurrentStateEvadeWithLeader = new QuestionNode(
-            () => _fsm.CurrState() is GoonStateEvade<StateEnum>,
+            () => _fsm.CurrState() is GoonStateEvadeConfigurable<StateEnum>,
             qIsEvadeTimeOver,
             qTargetInView
         );
