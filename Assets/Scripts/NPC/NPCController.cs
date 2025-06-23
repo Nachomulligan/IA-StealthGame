@@ -26,7 +26,6 @@ public class NPCController : BaseEnemyController
         var chase = new NPCSSteering<StateEnum>(new Pursuit(_model.transform, target, 0, timePrediction));
         var goZone = new NPCSSeek<StateEnum>(zone);
 
-        // El estado de búsqueda ahora usa el tracker directo
         searching = new NPCSSearching<StateEnum>(_model.transform, SearchTarget, targetTracker, 10f);
 
         List<Vector3> waypoints = new List<Vector3>();
@@ -41,7 +40,6 @@ public class NPCController : BaseEnemyController
 
         var stateList = new List<PSBase<StateEnum>> { idle, patrol, attack, chase, goZone, evade, searching };
 
-        // Configuración de transiciones (sin cambios)
         idle.AddTransition(StateEnum.Chase, chase);
         idle.AddTransition(StateEnum.Attack, attack);
         idle.AddTransition(StateEnum.GoZone, goZone);
@@ -113,7 +111,6 @@ public class NPCController : BaseEnemyController
 
         var qCurrentlyPatrolling = new QuestionNode(() => _fsm.CurrState() is NPCSPatrol<StateEnum>, qIsTired, qIsRested);
 
-        // Verificar si el target está visible ACTUALMENTE (no basado en timer) O si está persiguiendo
         var qTargetInView = new QuestionNode(() =>
             QuestionTargetInView() || _isChasing || (targetTracker?.WasTargetSeenRecently() ?? false),
             qShouldEvade, qCurrentlyPatrolling);

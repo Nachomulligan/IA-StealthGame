@@ -69,7 +69,6 @@ public class FlockingManager : MonoBehaviour, ISteering
         return null;
     }
 
-    // Métodos existentes (mantener compatibilidad)
     public void SetFlockingActive(FlockingType type, bool isActive)
     {
         var flocking = GetFlocking(type);
@@ -105,6 +104,8 @@ public class FlockingManager : MonoBehaviour, ISteering
         }
 
         _hasSnapshot = true;
+
+        //Stack
         Debug.Log("FlockingManager: Estado guardado correctamente");
     }
 
